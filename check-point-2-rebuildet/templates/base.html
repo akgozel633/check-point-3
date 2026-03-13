@@ -17,6 +17,16 @@
                 <a href="{{ url_for('search_online') }}" class="{{ 'active' if request.endpoint == 'search_online' }}">🔍 Search Web</a>
                 <a href="{{ url_for('create') }}" class="nav-btn">Add Recipe</a>
             </div>
+            <div class="nav-auth">
+                {% if current_user %}
+                    <span class="muted">Hello, {{ current_user.username }}</span>
+                    <a href="{{ url_for('history') }}">History</a>
+                    <a href="{{ url_for('logout') }}" class="nav-btn">Sign Out</a>
+                {% else %}
+                    <a href="{{ url_for('signup') }}">Sign Up</a>
+                    <a href="{{ url_for('login') }}" class="nav-btn">Log In</a>
+                {% endif %}
+            </div>
         </div>
     </nav>
 

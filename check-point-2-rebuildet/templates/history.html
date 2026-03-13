@@ -1,0 +1,15 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<h2>Your Search History</h2>
+{% if history %}
+    <ul class="history-list">
+    {% for row in history %}
+        <li>{{ row['timestamp'] }} — {{ row['query'] }}</li>
+    {% endfor %}
+    </ul>
+{% else %}
+    <p>No searches yet.</p>
+{% endif %}
+
+{% endblock %}
