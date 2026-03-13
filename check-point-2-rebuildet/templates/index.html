@@ -1,0 +1,52 @@
+{% extends "base.html" %}
+{% block content %}
+<header class="page-header" style="display: flex; justify-content: space-between; align-items: center; margin-bottom: 2rem;">
+    <h1>Your Recipe Collection</h1>
+    <a href="{{ url_for('create') }}" class="btn btn-primary">+ Add New Recipe</a>
+</header>
+
+<div class="recipe-grid">
+    {% for recipe in recipes %}
+    <div class="recipe-card" data-recipe-id="{{ recipe.id }}">
+        <div class="card-img-wrapper">
+            <img src="{{ recipe.image_url if recipe.image_url else 'https://images.unsplash.com/photo-1495195129352-aec325b55b65?q=80&w=1000' }}" class="recipe-card-img">
+            
+            <div class="heart-container" onclick="toggleFavorite(this, '{{ recipe.id }}')">
+                <i class="fa-heart {% if recipe.favorite %}fa-solid active{% else %}fa-regular{% endif %}"></i>
+            </div>
+        </div>
+
+        <div class="card-info">
+            <span class="category-tag">{{ recipe.category }}</span>
+            <h3>{{ recipe.name }}</h3>
+            <div class="rating">
+                {% for i in range(recipe.rating|int) %}★{% endfor %}
+            </div>
+        </div>
+
+        <div class="card-footer">
+            <a href="{{ url_for('view_recipe', recipe_id=recipe.id) }}" class="btn-text">View Recipe</a>
+            <div class="actions">
+                <a href="{{ url_for('edit', recipe_id=recipe.id) }}" class="edit-link" title="Edit">
+                    <i class="fa-solid fa-pen-to-square"></i>
+                </a>
+                <!-- Changed to button + onclick for AJAX delete -->
+                <button 
+                    type="button" 
+                    class="delete-btn" 
+                    onclick="deleteRecipe('{{ recipe.id }}', this)" 
+                    title="Delete"
+                >
+                    <i class="fa-solid fa-trash"></i>
+                </button>
+            </div>
+        </div>
+    </div>
+    {% else %}
+    <div style="grid-column: 1 / -1; text-align: center; padding: 3rem; background: white; border-radius: 15px;">
+        <h3>No recipes found.</h3>
+        <p>Start by adding one manually or searching the web!</p>
+    </div>
+    {% endfor %}
+</div>
+{% endblock %}
