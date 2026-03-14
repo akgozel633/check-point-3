@@ -218,24 +218,47 @@ def toggle_favorite(recipe_id):
 def search_online():
     results = []
     query = ""
+    ingredients = ""
+
     if request.method == 'POST':
         query = request.form.get('search_query', '').strip()
-        if query:
-            url = f"https://www.themealdb.com/api/json/v1/1/search.php?s={urllib.parse.quote(query)}"
-            data = fetch_from_mealdb(url)
-            results = data.get('meals') or [] if data else []
-            if not data:
-                flash("Connection error: Online search unavailable.", "danger")
-            # record history
-            try:
-                user = get_current_user()
-                cur = get_db().cursor()
-                cur.execute('INSERT INTO search_history (user_id, query) VALUES (?,?)', (user['id'] if user else None, query))
-                get_db().commit()
-            except Exception:
-                pass
-    return render_template('search.html', results=results, query=query, current_user=get_current_user())
+        ingredients = request.form.get('ingredients', '').strip()
 
+        if not query and not ingredients:
+            flash("Please enter a recipe name or ingredient.", "warning")
+            return render_template("search.html", results=[], query="")
+
+        if ingredients:
+            url = f"https://www.themealdb.com/api/json/v1/1/filter.php?i={urllib.parse.quote(ingredients)}"
+        else:
+            url = f"https://www.themealdb.com/api/json/v1/1/search.php?s={urllib.parse.quote(query)}"
+
+        data = fetch_from_mealdb(url)
+
+        if data and data.get("meals"):
+            results = data["meals"]
+        else:
+            results = []
+            flash("No recipes found.", "warning")
+
+        # save search history
+        try:
+            user = get_current_user()
+            cur = get_db().cursor()
+            cur.execute(
+                'INSERT INTO search_history (user_id, query) VALUES (?,?)',
+                (user['id'] if user else None, query or ingredients)
+            )
+            get_db().commit()
+        except Exception:
+            pass
+
+    return render_template(
+        "search.html",
+        results=results,
+        query=query or ingredients,
+        current_user=get_current_user()
+    )
 
 @app.route('/save_online/<string:meal_id>', methods=['POST'])
 def save_online(meal_id):
@@ -395,6 +418,7 @@ def history():
 
 
 if __name__ == '__main__':
-    init_db()
-    migrate_json_to_db()
+    with app.app_context():
+        init_db()
+        migrate_json_to_db()
     app.run(debug=True)

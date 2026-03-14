@@ -304,3 +304,64 @@ body {
     transform: translateY(20px);
     transition: opacity 0.4s ease, transform 0.4s ease;
 }
+
+
+.recipe-card.removing {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+
+/* ---------- NEW NAVBAR IMPROVEMENTS ---------- */
+
+.nav-btn {
+    background: #d4a373;
+    color: white !important;
+    padding: 0.55rem 1.3rem;
+    border-radius: 10px;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+.nav-btn:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 14px rgba(0,0,0,0.15);
+}
+
+.nav-btn-outline {
+    border: 2px solid #d4a373;
+    padding: 0.5rem 1.2rem;
+    border-radius: 10px;
+    color: #d4a373 !important;
+    font-weight: 600;
+    transition: all 0.25s ease;
+}
+
+.nav-btn-outline:hover {
+    background: #d4a373;
+    color: white !important;
+}
+
+.nav-links a.active {
+    border-bottom: 2px solid #d4a373;
+}
+
+.navbar {
+    box-shadow: 0 3px 12px rgba(0,0,0,0.08);
+}
+
+
+.nav-auth a {
+    color: white;
+    text-decoration: none;
+    font-weight: 500;
+}
+
+.nav-auth a:hover {
+    opacity: 0.8;
+}
+
+.nav-auth a:visited {
+    color: white;
+}
