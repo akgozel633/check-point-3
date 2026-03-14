@@ -395,6 +395,7 @@ def history():
 
 
 if __name__ == '__main__':
-    init_db()
-    migrate_json_to_db()
+    with app.app_context():
+        init_db()
+        migrate_json_to_db()
     app.run(debug=True)
