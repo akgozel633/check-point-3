@@ -26,20 +26,21 @@
 
         <div class="card-footer">
             <a href="{{ url_for('view_recipe', recipe_id=recipe.id) }}" class="btn-text">View Recipe</a>
-            <div class="actions">
-                <a href="{{ url_for('edit', recipe_id=recipe.id) }}" class="edit-link" title="Edit">
-                    <i class="fa-solid fa-pen-to-square"></i>
-                </a>
-                <!-- Changed to button + onclick for AJAX delete -->
-                <button 
-                    type="button" 
-                    class="delete-btn" 
-                    onclick="deleteRecipe('{{ recipe.id }}', this)" 
-                    title="Delete"
-                >
-                    <i class="fa-solid fa-trash"></i>
-                </button>
-            </div>
+            {% if current_user %}
+                <div class="actions">
+                    <a href="{{ url_for('edit', recipe_id=recipe.id) }}" class="edit-link" title="Edit">
+                        <i class="fa-solid fa-pen-to-square"></i>
+                    </a>
+                    <button 
+                        type="button" 
+                        class="delete-btn" 
+                        onclick="deleteRecipe('{{ recipe.id }}', this)" 
+                        title="Delete"
+                    >
+                        <i class="fa-solid fa-trash"></i>
+                    </button>
+                </div>
+            {% endif %}
         </div>
     </div>
     {% else %}

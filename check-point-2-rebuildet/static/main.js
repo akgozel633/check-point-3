@@ -105,4 +105,54 @@ document.addEventListener('DOMContentLoaded', () => {
             setTimeout(() => alert.remove(), 500);
         }, 3000);
     });
+
+    const pwdInput = document.getElementById('signup-password');
+    if (pwdInput) {
+        const meterBar = document.getElementById('signup-meter-bar');
+        const hintsRoot = document.getElementById('signup-hints');
+        const toggle = document.getElementById('signup-show');
+        const calcReqs = (pwd) => {
+            return {
+                length: pwd.length >= 8,
+                uppercase: /[A-Z]/.test(pwd),
+                lowercase: /[a-z]/.test(pwd),
+                digit: /\d/.test(pwd),
+                symbol: /[^A-Za-z0-9]/.test(pwd),
+            };
+        };
+        const updateHints = (reqs) => {
+            if (!hintsRoot) return;
+            ['length','uppercase','lowercase','digit','symbol'].forEach(key => {
+                const li = hintsRoot.querySelector(`li[data-req="${key}"]`);
+                if (li) {
+                    li.classList.toggle('ok', !!reqs[key]);
+                }
+            });
+        };
+        const updateMeter = (reqs) => {
+            const score = Object.values(reqs).filter(Boolean).length; // 0..5
+            const pct = (score / 5) * 100;
+            meterBar.style.width = `${pct}%`;
+            meterBar.style.background = score <= 2 ? '#dc3545' : (score === 3 ? '#ffc107' : '#28a745');
+        };
+        const refresh = () => {
+            const reqs = calcReqs(pwdInput.value || '');
+            updateHints(reqs);
+            updateMeter(reqs);
+        };
+        pwdInput.addEventListener('input', refresh);
+        if (toggle) {
+            toggle.addEventListener('change', () => {
+                pwdInput.type = toggle.checked ? 'text' : 'password';
+            });
+        }
+        refresh();
+    }
+    const loginPwd = document.getElementById('login-password');
+    const loginToggle = document.getElementById('login-show');
+    if (loginPwd && loginToggle) {
+        loginToggle.addEventListener('change', () => {
+            loginPwd.type = loginToggle.checked ? 'text' : 'password';
+        });
+    }
 });

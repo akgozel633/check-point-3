@@ -304,3 +304,55 @@ body {
     transform: translateY(20px);
     transition: opacity 0.4s ease, transform 0.4s ease;
 }
+
+.password-meter {
+    height: 8px;
+    background: #eee;
+    border-radius: 4px;
+    margin-top: 8px;
+    overflow: hidden;
+}
+.password-meter-bar {
+    height: 100%;
+    width: 0%;
+    background: #dc3545;
+    transition: width 0.2s ease;
+}
+.password-hints ul {
+    list-style: none;
+    padding: 0;
+    margin: 0.25rem 0 0 0;
+}
+.password-hints li {
+    color: #888;
+    margin: 2px 0;
+}
+.password-hints li.ok {
+    color: #28a745;
+}
+
+.password-input-row {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+.show-toggle {
+    white-space: nowrap;
+    font-size: 0.9rem;
+    color: #555;
+}
+.password-hints li::before {
+    content: "";
+    display: inline-block;
+    width: 10px;
+    height: 10px;
+    border-radius: 50%;
+    border: 2px solid #ccc;
+    margin-right: 8px;
+    vertical-align: middle;
+    box-sizing: border-box;
+}
+.password-hints li.ok::before {
+    background: #28a745;
+    border-color: #28a745;
+}

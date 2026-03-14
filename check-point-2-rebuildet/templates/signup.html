@@ -2,11 +2,42 @@
 
 {% block content %}
 <h2>Sign Up</h2>
-<form method="post" action="{{ url_for('signup') }}" class="form">
-    <label>Username</label>
-    <input type="text" name="username" required>
-    <label>Password</label>
-    <input type="password" name="password" required>
-    <button type="submit" class="btn">Create Account</button>
-</form>
+<div class="form-container">
+  <form method="post" action="{{ url_for('signup') }}" class="form" id="signup-form">
+      <div class="form-group">
+          <label>Username</label>
+          <input class="form-input" type="text" name="username" required>
+      </div>
+      <div class="form-group" style="display:flex; gap:16px; align-items:flex-start;">
+          <div style="flex:1;">
+              <label>Password</label>
+              <div class="password-input-row">
+                  <input class="form-input" type="password" name="password" id="signup-password" required>
+                  <label class="show-toggle"><input type="checkbox" id="signup-show"> Show</label>
+              </div>
+              <div class="password-meter" id="signup-meter">
+                  <div class="password-meter-bar" id="signup-meter-bar"></div>
+              </div>
+          </div>
+          <div class="password-hints" id="signup-hints" style="flex:1;">
+              <div>Requirements:</div>
+              <ul>
+                  <li data-req="length">At least 8 characters</li>
+                  <li data-req="uppercase">Contains uppercase letter</li>
+                  <li data-req="lowercase">Contains lowercase letter</li>
+                  <li data-req="digit">Contains a digit</li>
+                  <li data-req="symbol">Contains a symbol</li>
+              </ul>
+          </div>
+      </div>
+      <div class="form-group">
+          <label>Captcha: Solve {{ captcha_question }}</label>
+          <input class="form-input" type="text" name="captcha" required>
+      </div>
+      <button type="submit" class="btn btn-primary">Create Account</button>
+      <div style="margin-top: 0.75rem;">
+          <a href="{{ url_for('login') }}">Or Log In</a>
+      </div>
+  </form>
+</div>
 {% endblock %}
