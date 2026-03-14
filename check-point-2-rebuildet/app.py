@@ -3,6 +3,8 @@ import os
 import urllib.request
 import urllib.parse
 import sqlite3
+import re
+import random
 from flask import Flask, render_template, request, redirect, url_for, flash, jsonify, g, session
 from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -11,6 +13,7 @@ app = Flask(__name__)
 app.secret_key = "recipe_pro_ultra_secret_2026"
 DATA_FILE = 'recipes.json'
 DATABASE = 'recipes.db'
+APP_BOOT_ID = str(uuid4())
 
 
 # --- 1. DATABASE HELPERS (sqlite3) ---
@@ -45,6 +48,10 @@ def init_db():
             favorite INTEGER DEFAULT 0
         )
     ''')
+    try:
+        cur.execute('ALTER TABLE recipes ADD COLUMN owner_id INTEGER')
+    except Exception:
+        pass
     cur.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -94,13 +101,17 @@ def row_to_recipe(row):
         'image_url': row['image_url'],
         'ingredients': row['ingredients'],
         'instructions': row['instructions'],
-        'favorite': bool(row['favorite'])
+        'favorite': bool(row['favorite']),
+        'owner_id': row['owner_id'] if 'owner_id' in row.keys() else None
     }
 
 
 def load_recipes():
+    user = get_current_user()
     cur = get_db().cursor()
-    cur.execute('SELECT * FROM recipes ORDER BY name COLLATE NOCASE')
+    if not user:
+        return []
+    cur.execute('SELECT * FROM recipes WHERE owner_id=? ORDER BY name COLLATE NOCASE', (user['id'],))
     rows = cur.fetchall()
     return [row_to_recipe(r) for r in rows]
 
@@ -115,8 +126,8 @@ def get_recipe_by_id(recipe_id):
 def add_recipe_to_db(recipe):
     cur = get_db().cursor()
     cur.execute(
-        "INSERT INTO recipes (id, name, category, rating, image_url, ingredients, instructions, favorite) VALUES (?,?,?,?,?,?,?,?)",
-        (recipe['id'], recipe['name'], recipe['category'], recipe['rating'], recipe['image_url'], recipe['ingredients'], recipe['instructions'], 1 if recipe.get('favorite') else 0)
+        "INSERT INTO recipes (id, name, category, rating, image_url, ingredients, instructions, favorite, owner_id) VALUES (?,?,?,?,?,?,?,?,?)",
+        (recipe['id'], recipe['name'], recipe['category'], recipe['rating'], recipe['image_url'], recipe['ingredients'], recipe['instructions'], 1 if recipe.get('favorite') else 0, recipe.get('owner_id'))
     )
     get_db().commit()
 
@@ -186,7 +197,8 @@ def build_recipe_from_meal(meal):
 
 @app.route('/')
 def home():
-    """Displays all recipes on the dashboard."""
+    if session.get('boot_id') != APP_BOOT_ID:
+        return redirect(url_for('welcome'))
     return render_template('index.html', recipes=load_recipes(), current_user=get_current_user())
 
 
@@ -202,9 +214,14 @@ def view_recipe(recipe_id):
 @app.route('/toggle_favorite/<string:recipe_id>', methods=['POST'])
 def toggle_favorite(recipe_id):
     try:
+        user = get_current_user()
+        if not user:
+            return jsonify({"status": "error", "message": "Login required"}), 401
         recipe = get_recipe_by_id(recipe_id)
         if not recipe:
             return jsonify({"status": "error", "message": "Recipe not found"})
+        if recipe.get('owner_id') != user['id']:
+            return jsonify({"status": "error", "message": "Forbidden"}), 403
 
         data = request.get_json()
         new_status = data.get('favorite', False)
@@ -263,10 +280,14 @@ def search_online():
 @app.route('/save_online/<string:meal_id>', methods=['POST'])
 def save_online(meal_id):
     try:
+        if not get_current_user():
+            flash("Please log in or sign up to save recipes.", "warning")
+            return redirect(url_for('login'))
         meal = fetch_meal_from_api(meal_id)
         if meal is None:
             raise ValueError("Meal not found in API.")
         new_recipe = build_recipe_from_meal(meal)
+        new_recipe['owner_id'] = get_current_user()['id']
         add_recipe_to_db(new_recipe)
         flash(f"'{new_recipe['name']}' added to your collection!", "success")
     except ValueError as e:
@@ -279,6 +300,9 @@ def save_online(meal_id):
 @app.route('/create', methods=['GET', 'POST'])
 def create():
     if request.method == 'POST':
+        if not get_current_user():
+            flash("Please log in or sign up to save recipes.", "warning")
+            return redirect(url_for('login'))
         try:
             rating = int(request.form.get('rating', 5))
             if not 1 <= rating <= 5:
@@ -292,7 +316,8 @@ def create():
                 "image_url": request.form.get('image_url', '').strip(),
                 "ingredients": request.form.get('ingredients', '').strip(),
                 "instructions": request.form.get('instructions', '').strip(),
-                "favorite": False
+                "favorite": False,
+                "owner_id": get_current_user()['id']
             }
             add_recipe_to_db(new_entry)
             flash("Recipe created successfully!", "success")
@@ -306,9 +331,15 @@ def create():
 
 @app.route('/edit/<string:recipe_id>', methods=['GET', 'POST'])
 def edit(recipe_id):
+    if not get_current_user():
+        flash("Please log in or sign up to edit recipes.", "warning")
+        return redirect(url_for('login'))
     recipe = get_recipe_by_id(recipe_id)
     if not recipe:
         flash("Recipe not found!", "danger")
+        return redirect(url_for('home'))
+    if recipe.get('owner_id') != get_current_user()['id']:
+        flash("You do not have permission to edit this recipe.", "danger")
         return redirect(url_for('home'))
 
     if request.method == 'POST':
@@ -337,6 +368,11 @@ def edit(recipe_id):
 @app.route('/delete/<string:recipe_id>', methods=['POST'])
 def delete(recipe_id):
     try:
+        if not get_current_user():
+            return jsonify({"success": False, "message": "Login required"}), 401
+        recipe = get_recipe_by_id(recipe_id)
+        if not recipe or recipe.get('owner_id') != get_current_user()['id']:
+            return jsonify({"success": False, "message": "Forbidden"}), 403
         cur = get_db().cursor()
         cur.execute('DELETE FROM recipes WHERE id=?', (recipe_id,))
         if cur.rowcount:
@@ -361,13 +397,55 @@ def get_current_user():
     return {'id': row['id'], 'username': row['username']} if row else None
 
 
+def generate_captcha():
+    a = random.randint(1, 9)
+    b = random.randint(1, 9)
+    session['captcha_answer'] = str(a + b)
+    return f"{a} + {b} = ?"
+
+
+def password_requirements(password):
+    reqs = {
+        'length': len(password) >= 8,
+        'uppercase': bool(re.search(r'[A-Z]', password)),
+        'lowercase': bool(re.search(r'[a-z]', password)),
+        'digit': bool(re.search(r'\d', password)),
+        'symbol': bool(re.search(r'[^A-Za-z0-9]', password)),
+    }
+    return reqs
+
+
+def password_is_strong(password):
+    reqs = password_requirements(password)
+    return all(reqs.values()), reqs
+
+
 @app.route('/signup', methods=['GET', 'POST'])
 def signup():
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '')
+        captcha_input = request.form.get('captcha', '').strip()
+        if captcha_input != session.get('captcha_answer'):
+            flash('Captcha incorrect.', 'danger')
+            return redirect(url_for('signup'))
         if not username or not password:
             flash('Username and password are required.', 'danger')
+            return redirect(url_for('signup'))
+        ok, reqs = password_is_strong(password)
+        if not ok:
+            messages = []
+            if not reqs['length']:
+                messages.append('At least 8 characters.')
+            if not reqs['uppercase']:
+                messages.append('Include an uppercase letter.')
+            if not reqs['lowercase']:
+                messages.append('Include a lowercase letter.')
+            if not reqs['digit']:
+                messages.append('Include a digit.')
+            if not reqs['symbol']:
+                messages.append('Include a symbol.')
+            flash('Weak password: ' + ' '.join(messages), 'danger')
             return redirect(url_for('signup'))
         try:
             cur = get_db().cursor()
@@ -377,7 +455,8 @@ def signup():
             return redirect(url_for('login'))
         except Exception:
             flash('Username already taken or error creating account.', 'danger')
-    return render_template('signup.html', current_user=get_current_user())
+    captcha_question = generate_captcha()
+    return render_template('signup.html', current_user=get_current_user(), captcha_question=captcha_question)
 
 
 @app.route('/login', methods=['GET', 'POST'])
@@ -385,23 +464,44 @@ def login():
     if request.method == 'POST':
         username = request.form.get('username', '').strip()
         password = request.form.get('password', '')
+        captcha_input = request.form.get('captcha', '').strip()
+        if captcha_input != session.get('captcha_answer'):
+            flash('Captcha incorrect.', 'danger')
+            return redirect(url_for('login'))
         cur = get_db().cursor()
         cur.execute('SELECT id, password_hash FROM users WHERE username=?', (username,))
         row = cur.fetchone()
         if row and check_password_hash(row['password_hash'], password):
             session['user_id'] = row['id']
             session['username'] = username
+            session['accepted_welcome'] = True
+            session['boot_id'] = APP_BOOT_ID
             flash('Logged in successfully.', 'success')
             return redirect(url_for('home'))
         flash('Invalid credentials.', 'danger')
-    return render_template('login.html', current_user=get_current_user())
+    captcha_question = generate_captcha()
+    return render_template('login.html', current_user=get_current_user(), captcha_question=captcha_question)
 
 
 @app.route('/logout')
 def logout():
     session.pop('user_id', None)
     session.pop('username', None)
+    session.pop('guest', None)
+    session.pop('accepted_welcome', None)
+    session.pop('boot_id', None)
     flash('Signed out.', 'info')
+    return redirect(url_for('welcome'))
+
+@app.route('/welcome')
+def welcome():
+    return render_template('welcome.html', current_user=get_current_user())
+
+@app.route('/guest')
+def guest_mode():
+    session['guest'] = True
+    session['accepted_welcome'] = True
+    session['boot_id'] = APP_BOOT_ID
     return redirect(url_for('home'))
 
 
@@ -409,7 +509,7 @@ def logout():
 def history():
     user = get_current_user()
     if not user:
-        flash('Please log in to view your search history.', 'warning')
+        flash('Please log in or sign up to view your search history.', 'warning')
         return redirect(url_for('login'))
     cur = get_db().cursor()
     cur.execute('SELECT query, timestamp FROM search_history WHERE user_id=? ORDER BY timestamp DESC', (user['id'],))
@@ -418,7 +518,7 @@ def history():
 
 
 if __name__ == '__main__':
-    with app.app_context():
-        init_db()
-        migrate_json_to_db()
+    init_db()
+    migrate_json_to_db()
     app.run(debug=True)
+## lolo
