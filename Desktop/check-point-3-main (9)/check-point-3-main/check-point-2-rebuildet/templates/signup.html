@@ -1,0 +1,76 @@
+{% extends 'base.html' %}
+
+{% block content %}
+
+<h2 style="text-align:center;">Sign Up</h2>
+
+<div class="form-container">
+
+<form method="post" action="{{ url_for('signup') }}" class="form" id="signupForm">
+
+<div class="form-group">
+<label>Username</label>
+<input class="form-input" type="text" name="username" value="{{ username or '' }}" required>
+</div>
+
+<div class="form-group">
+<label>Password</label>
+<div class="password-input-container">
+    <input class="form-input" type="password" name="password" id="password" required>
+    <button type="button" class="password-toggle" id="passwordToggle" title="Show password">
+        <i class="fas fa-eye"></i>
+    </button>
+</div>
+<div class="password-strength-container">
+    <div class="password-strength-bar">
+        <div class="password-strength-fill" id="strengthFill"></div>
+    </div>
+    <div class="password-strength-text" id="strengthText">Enter a password</div>
+</div>
+<div class="password-requirements" id="passwordRequirements">
+    <div class="requirement" data-requirement="length">
+        <i class="fas fa-times-circle"></i> At least 8 characters
+    </div>
+    <div class="requirement" data-requirement="uppercase">
+        <i class="fas fa-times-circle"></i> At least one uppercase letter
+    </div>
+    <div class="requirement" data-requirement="lowercase">
+        <i class="fas fa-times-circle"></i> At least one lowercase letter
+    </div>
+    <div class="requirement" data-requirement="number">
+        <i class="fas fa-times-circle"></i> At least one number
+    </div>
+    <div class="requirement" data-requirement="special">
+        <i class="fas fa-times-circle"></i> At least one special character (!@#$%^&*...)
+    </div>
+</div>
+</div>
+
+<div class="form-group">
+<label>Confirm Password</label>
+<input class="form-input" type="password" name="confirm_password" id="confirmPassword" required>
+<div class="password-match" id="passwordMatch">
+    <i class="fas fa-times-circle"></i> <span id="matchText">Passwords do not match</span>
+</div>
+</div>
+
+<div class="form-group">
+<label>Captcha: <strong>{{ captcha_question }}</strong></label>
+<input class="form-input" type="text" name="captcha" placeholder="Enter the answer" required>
+</div>
+
+<button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;" id="submitBtn">
+Create Account
+</button>
+
+<div style="margin-top:15px; text-align:center;">
+<a href="{{ url_for('login') }}" class="btn btn-primary">
+Log In
+</a>
+</div>
+
+</form>
+
+</div>
+
+{% endblock %}

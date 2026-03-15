@@ -1,0 +1,13 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="form-container" style="text-align: center; max-width: 600px;">
+  <h2>Welcome</h2>
+  <p>Choose how you want to continue.</p>
+  <div style="display: flex; gap: 1rem; justify-content: center; margin-top: 1rem;">
+    <a href="{{ url_for('signup') }}" class="btn btn-primary">Sign Up</a>
+    <a href="{{ url_for('login') }}" class="btn btn-primary">Log In</a>
+    <a href="{{ url_for('guest_mode') }}" class="btn btn-primary">Continue as Guest</a>
+  </div>
+</div>
+{% endblock %}
