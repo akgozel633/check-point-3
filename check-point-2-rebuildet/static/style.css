@@ -303,4 +303,81 @@ body {
     opacity: 0;
     transform: translateY(20px);
     transition: opacity 0.4s ease, transform 0.4s ease;
-},style.css
+}
+
+/* === AI Helper Styles === */
+.ai-helper {
+    position: fixed;
+    bottom: 20px;
+    right: -500px;
+    width: auto;
+    max-width: 350px;
+    background: transparent; /* убираем белый квадрат позади */
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    transition: right 0.8s ease;
+    z-index: 9999;
+}
+
+.ai-helper.show {
+    right: 20px;
+    animation: slideIn 1s ease-out;
+}
+
+.ai-avatar img {
+    width: 200px;
+    height: auto;
+}
+
+.ai-message {
+    background: #fff;
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    box-shadow: 0 4px 12px rgba(0, 30, 255, 0.849);
+    position: relative;
+    max-width: min(420px, 80vw); /* не шире 420px и не больше 80% экрана */
+    line-height: 1.4; /* делаем текст более читаемым */
+    word-wrap: break-word; /* переносим длинные слова */
+    display: inline-block; /* облачко подстраивается под текст */
+    
+}
+
+/* «хвостик» как в комиксах */
+.ai-message::after {
+    content: none;
+    position: absolute;
+    left: -10px;
+    bottom: 20px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-right: 10px solid #fff;
+    border-bottom: 10px solid transparent;
+}
+
+.ai-message p {
+    margin: 0;
+    font-size: 1rem;
+    color: #333;
+    white-space: normal; /* разрешаем перенос строк */
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink {
+    50% { border-color: transparent; }
+}
+
+.ai-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #333;
+    cursor: pointer;
+    margin-left: 5px;
+}
+

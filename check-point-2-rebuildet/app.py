@@ -172,11 +172,50 @@ def search_online():
         if data and data.get("meals"):
             results = data["meals"]
         else:
+            results = []
+
+        # Also include any local recipes (created/saved by the current user)
+        user = get_current_user()
+        if user:
+            cur = get_db().cursor()
+            sql = "SELECT * FROM recipes WHERE owner_id=?"
+            params = [user['id']]
+
+            if query:
+                sql += " AND (name LIKE ? OR ingredients LIKE ?)"
+                like_q = f"%{query}%"
+                params.extend([like_q, like_q])
+
+            if ingredients:
+                sql += " AND ingredients LIKE ?"
+                params.append(f"%{ingredients}%")
+
+            cur.execute(sql, params)
+            local_rows = cur.fetchall()
+
+            local_results = []
+            for row in local_rows:
+                local_results.append({
+                    "idMeal": row["id"],
+                    "strMeal": row["name"],
+                    "strCategory": row["category"],
+                    "strMealThumb": row["image_url"] or "",
+                    "strIngredients": row["ingredients"],
+                    "strInstructions": row["instructions"],
+                    "is_local": True
+                })
+
+            if local_results:
+                existing_ids = {meal.get('idMeal') for meal in results}
+                for meal in local_results:
+                    if meal['idMeal'] not in existing_ids:
+                        results.append(meal)
+
+        if not results:
             flash("No recipes found.", "warning")
 
         # Save search history
         try:
-            user = get_current_user()
             cur = get_db().cursor()
             cur.execute(
                 "INSERT INTO search_history (user_id, query) VALUES (?, ?)",
@@ -302,7 +341,77 @@ def view_recipe(recipe_id):
         return redirect(url_for('home'))
 
     recipe = row_to_recipe(row)
-    return render_template("view_recipe.html", recipe=recipe, current_user=get_current_user())
+    return render_template("recipe_detail.html", recipe=recipe, current_user=get_current_user())
+
+@app.route('/edit/<recipe_id>', methods=['GET','POST'])
+def edit(recipe_id):
+    user = get_current_user()
+    if not user:
+        flash("Login required.", "warning")
+        return redirect(url_for('login'))
+
+    cur = get_db().cursor()
+    cur.execute("SELECT * FROM recipes WHERE id=? AND owner_id=?", (recipe_id, user['id']))
+    row = cur.fetchone()
+    if not row:
+        flash("Recipe not found or not yours.", "danger")
+        return redirect(url_for('home'))
+
+    recipe = row_to_recipe(row)
+
+    if request.method == 'POST':
+        cur.execute(
+            "UPDATE recipes SET name=?, category=?, rating=?, image_url=?, ingredients=?, instructions=? WHERE id=?",
+            (
+                request.form.get('name'),
+                request.form.get('category'),
+                int(request.form.get('rating',5)),
+                request.form.get('image_url'),
+                request.form.get('ingredients'),
+                request.form.get('instructions'),
+                recipe_id
+            )
+        )
+        get_db().commit()
+        flash("Recipe updated!", "success")
+        return redirect(url_for('view_recipe', recipe_id=recipe_id))
+
+    return render_template("edit_recipe.html", recipe=recipe, current_user=user)
+
+@app.route('/delete/<recipe_id>', methods=['POST'])
+def delete_recipe(recipe_id):
+    user = get_current_user()
+    if not user:
+        return {"success": False, "message": "Login required"}, 401
+
+    cur = get_db().cursor()
+    cur.execute("DELETE FROM recipes WHERE id=? AND owner_id=?", (recipe_id, user['id']))
+    get_db().commit()
+
+    return {"success": True, "message": "Recipe deleted successfully"}
+
+
+@app.route('/toggle_favorite/<recipe_id>', methods=['POST'])
+def toggle_favorite(recipe_id):
+    user = get_current_user()
+    if not user:
+        return {"success": False, "error": "Login required"}, 401
+
+    cur = get_db().cursor()
+    cur.execute("SELECT favorite FROM recipes WHERE id=? AND owner_id=?", (recipe_id, user['id']))
+    row = cur.fetchone()
+    if not row:
+        return {"success": False, "error": "Recipe not found"}, 404
+
+    new_value = 0 if row['favorite'] else 1
+    cur.execute("UPDATE recipes SET favorite=? WHERE id=?", (new_value, recipe_id))
+    get_db().commit()
+
+    return {"success": True, "favorite": bool(new_value)}
+
+
+
+
 
 @app.route('/save_online/<meal_id>', methods=['POST'])
 def save_online(meal_id):

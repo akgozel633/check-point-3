@@ -42,7 +42,11 @@
             <span class="category-tag">{{ meal.strCategory if meal.strCategory else '' }}</span>
             <h3 style="font-size:1.3rem;">{{ meal.strMeal }}</h3>
 
-            {% if current_user %}
+            {% if meal.is_local %}
+            <button type="button" class="btn btn-secondary" style="width:100%; justify-content:center;" disabled>
+                ✅ In your collection
+            </button>
+            {% elif current_user %}
             <form action="{{ url_for('save_online', meal_id=meal.idMeal) }}" method="POST" style="margin-top:1rem; width:100%;">
                 <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
                     <i class="fa fa-download"></i> Save to Collection

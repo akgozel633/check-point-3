@@ -58,6 +58,16 @@
     {% endwith %}
 
     {% block content %}{% endblock %}
+    <!-- AI Helper -->
+<div id="ai-helper" class="ai-helper hidden">
+    <div class="ai-avatar">
+        <img src="{{ url_for('static', filename='images/assistant.png') }}" alt="AI Assistant">
+    </div>
+    <div class="ai-message">
+        <p>Welcome to RecipeLog Pro! 🍳<br>
+        Here you can save, search, and manage your favorite recipes easily.</p>
+    </div>
+    <button class="ai-close">&times;</button>
 </div>
 
 <!-- FOOTER -->

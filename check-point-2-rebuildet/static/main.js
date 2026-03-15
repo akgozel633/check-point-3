@@ -155,4 +155,39 @@ document.addEventListener('DOMContentLoaded', () => {
             loginPwd.type = loginToggle.checked ? 'text' : 'password';
         });
     }
+
+    // --- AI Helper Animation & Close ---
+    const helper = document.getElementById('ai-helper');
+    const closeBtn = document.querySelector('.ai-close');
+    const message = helper ? helper.querySelector('.ai-message p') : null;
+
+    // функция печати текста
+    function typeText(element, text, speed = 50) {
+        element.textContent = "";
+        let i = 0;
+        const interval = setInterval(() => {
+            element.textContent += text[i];
+            i++;
+            if (i >= text.length) {
+                clearInterval(interval);
+            }
+        }, speed);
+    }
+
+    // показываем только на welcome.html и если не закрыт в текущей сессии
+    if (helper && window.location.pathname.includes("welcome") && !sessionStorage.getItem('helperClosed')) {
+        setTimeout(() => {
+            helper.classList.add('show');
+            if (message) {
+                typeText(message, "Welcome to RecipeLog Pro! 🍳 Here you can save, search, and manage your favorite recipes with ease.", 40);
+            }
+        }, 1500); // появится через 1.5 секунды
+    }
+
+    if (closeBtn) {
+        closeBtn.addEventListener('click', () => {
+            helper.classList.remove('show');
+            sessionStorage.setItem('helperClosed', 'true'); // запоминаем только на время текущей сессии
+        });
+    }
 });
