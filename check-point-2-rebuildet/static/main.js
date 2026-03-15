@@ -310,6 +310,29 @@ document.addEventListener('DOMContentLoaded', () => {
         validateForm();
     }
 
+    // --- Login Password Toggle ---
+    const loginPassword = document.getElementById('loginPassword');
+    const loginPasswordToggle = document.getElementById('loginPasswordToggle');
+    
+    if (loginPassword && loginPasswordToggle) {
+        loginPasswordToggle.addEventListener('click', () => {
+            const type = loginPassword.type === 'password' ? 'text' : 'password';
+            loginPassword.type = type;
+            
+            // Update icon
+            const icon = loginPasswordToggle.querySelector('i');
+            if (type === 'text') {
+                icon.classList.remove('fa-eye');
+                icon.classList.add('fa-eye-slash');
+                loginPasswordToggle.setAttribute('title', 'Hide password');
+            } else {
+                icon.classList.remove('fa-eye-slash');
+                icon.classList.add('fa-eye');
+                loginPasswordToggle.setAttribute('title', 'Show password');
+            }
+        });
+    }
+
     const loginPwd = document.getElementById('login-password');
     const loginToggle = document.getElementById('login-show');
     if (loginPwd && loginToggle) {
