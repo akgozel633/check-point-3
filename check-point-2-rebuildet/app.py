@@ -13,6 +13,10 @@ app.secret_key = "recipe_pro_ultra_secret_2026"
 DATABASE = 'recipes.db'
 APP_BOOT_ID = str(uuid4())
 
+
+
+print("hi")
+
 # ---------------- DATABASE ----------------
 
 def get_db():
