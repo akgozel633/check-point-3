@@ -106,48 +106,210 @@ document.addEventListener('DOMContentLoaded', () => {
         }, 3000);
     });
 
-    const pwdInput = document.getElementById('signup-password');
-    if (pwdInput) {
-        const meterBar = document.getElementById('signup-meter-bar');
-        const hintsRoot = document.getElementById('signup-hints');
-        const toggle = document.getElementById('signup-show');
-        const calcReqs = (pwd) => {
-            return {
-                length: pwd.length >= 8,
-                uppercase: /[A-Z]/.test(pwd),
-                lowercase: /[a-z]/.test(pwd),
-                digit: /\d/.test(pwd),
-                symbol: /[^A-Za-z0-9]/.test(pwd),
-            };
-        };
-        const updateHints = (reqs) => {
-            if (!hintsRoot) return;
-            ['length','uppercase','lowercase','digit','symbol'].forEach(key => {
-                const li = hintsRoot.querySelector(`li[data-req="${key}"]`);
-                if (li) {
-                    li.classList.toggle('ok', !!reqs[key]);
+    // --- Password Strength Validation for Signup ---
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirmPassword');
+    const passwordToggle = document.getElementById('passwordToggle');
+    const strengthFill = document.getElementById('strengthFill');
+    const strengthText = document.getElementById('strengthText');
+    const passwordRequirements = document.getElementById('passwordRequirements');
+    const passwordMatch = document.getElementById('passwordMatch');
+    const matchText = document.getElementById('matchText');
+    const submitBtn = document.getElementById('submitBtn');
+    const signupForm = document.getElementById('signupForm');
+
+    if (passwordInput && signupForm) {
+        // Password visibility toggle
+        if (passwordToggle) {
+            passwordToggle.addEventListener('click', () => {
+                const type = passwordInput.type === 'password' ? 'text' : 'password';
+                passwordInput.type = type;
+                
+                // Update icon
+                const icon = passwordToggle.querySelector('i');
+                if (type === 'text') {
+                    icon.classList.remove('fa-eye');
+                    icon.classList.add('fa-eye-slash');
+                    passwordToggle.setAttribute('title', 'Hide password');
+                } else {
+                    icon.classList.remove('fa-eye-slash');
+                    icon.classList.add('fa-eye');
+                    passwordToggle.setAttribute('title', 'Show password');
                 }
             });
-        };
-        const updateMeter = (reqs) => {
-            const score = Object.values(reqs).filter(Boolean).length; // 0..5
-            const pct = (score / 5) * 100;
-            meterBar.style.width = `${pct}%`;
-            meterBar.style.background = score <= 2 ? '#dc3545' : (score === 3 ? '#ffc107' : '#28a745');
-        };
-        const refresh = () => {
-            const reqs = calcReqs(pwdInput.value || '');
-            updateHints(reqs);
-            updateMeter(reqs);
-        };
-        pwdInput.addEventListener('input', refresh);
-        if (toggle) {
-            toggle.addEventListener('change', () => {
-                pwdInput.type = toggle.checked ? 'text' : 'password';
-            });
         }
-        refresh();
+        // Password strength checker function (mirrors backend logic)
+        function checkPasswordStrength(password) {
+            const requirements = {
+                length: password.length >= 8,
+                uppercase: /[A-Z]/.test(password),
+                lowercase: /[a-z]/.test(password),
+                number: /\d/.test(password),
+                special: /[!@#$%^&*(),.?":{}|<>]/.test(password)
+            };
+            
+            const score = Object.values(requirements).filter(Boolean).length;
+            const isStrong = score >= 4;
+            
+            return { requirements, score, isStrong };
+        }
+
+        // Update password strength UI
+        function updatePasswordStrength(password) {
+            const { requirements, score, isStrong } = checkPasswordStrength(password);
+            
+            // Update strength bar
+            strengthFill.className = 'password-strength-fill';
+            strengthText.className = 'password-strength-text';
+            
+            if (score === 0) {
+                strengthText.textContent = 'Enter a password';
+            } else if (score === 1) {
+                strengthFill.classList.add('weak');
+                strengthText.classList.add('weak');
+                strengthText.textContent = 'Weak password';
+            } else if (score === 2) {
+                strengthFill.classList.add('fair');
+                strengthText.classList.add('fair');
+                strengthText.textContent = 'Fair password';
+            } else if (score === 3) {
+                strengthFill.classList.add('good');
+                strengthText.classList.add('good');
+                strengthText.textContent = 'Good password';
+            } else if (score === 4) {
+                strengthFill.classList.add('strong');
+                strengthText.classList.add('strong');
+                strengthText.textContent = 'Strong password';
+            } else {
+                strengthFill.classList.add('very-strong');
+                strengthText.classList.add('very-strong');
+                strengthText.textContent = 'Very strong password';
+            }
+            
+            // Update requirements list
+            Object.keys(requirements).forEach(req => {
+                const reqElement = passwordRequirements.querySelector(`[data-requirement="${req}"]`);
+                if (reqElement) {
+                    if (requirements[req]) {
+                        reqElement.classList.add('met');
+                    } else {
+                        reqElement.classList.remove('met');
+                    }
+                }
+            });
+            
+            // Update password input validation style
+            if (password.length > 0) {
+                passwordInput.classList.toggle('valid', isStrong);
+                passwordInput.classList.toggle('invalid', !isStrong);
+            } else {
+                passwordInput.classList.remove('valid', 'invalid');
+            }
+            
+            return isStrong;
+        }
+
+        // Update password match UI
+        function updatePasswordMatch() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            
+            if (confirmPassword.length === 0) {
+                passwordMatch.classList.remove('match');
+                confirmPasswordInput.classList.remove('valid', 'invalid');
+                return false;
+            }
+            
+            const isMatch = password === confirmPassword;
+            passwordMatch.classList.toggle('match', isMatch);
+            matchText.textContent = isMatch ? 'Passwords match' : 'Passwords do not match';
+            
+            confirmPasswordInput.classList.toggle('valid', isMatch);
+            confirmPasswordInput.classList.toggle('invalid', !isMatch);
+            
+            return isMatch;
+        }
+
+        // Form validation
+        function validateForm() {
+            const password = passwordInput.value;
+            const confirmPassword = confirmPasswordInput.value;
+            const username = signupForm.querySelector('input[name="username"]').value;
+            const captcha = signupForm.querySelector('input[name="captcha"]').value;
+            
+            const { isStrong: isPasswordStrong } = checkPasswordStrength(password);
+            const isPasswordMatch = password === confirmPassword && confirmPassword.length > 0;
+            
+            // Update password match UI
+            if (confirmPassword.length > 0) {
+                passwordMatch.classList.toggle('match', isPasswordMatch);
+                matchText.textContent = isPasswordMatch ? 'Passwords match' : 'Passwords do not match';
+                confirmPasswordInput.classList.toggle('valid', isPasswordMatch);
+                confirmPasswordInput.classList.toggle('invalid', !isPasswordMatch);
+            }
+            
+            // Enable/disable submit button
+            const isValid = username.length > 0 && 
+                           password.length > 0 && 
+                           confirmPassword.length > 0 && 
+                           isPasswordStrong && 
+                           isPasswordMatch && 
+                           captcha.length > 0;
+            
+            submitBtn.disabled = !isValid;
+            submitBtn.style.opacity = isValid ? '1' : '0.6';
+            
+            return isValid;
+        }
+
+        // Event listeners
+        passwordInput.addEventListener('input', () => {
+            updatePasswordStrength(passwordInput.value);
+            if (confirmPasswordInput.value) {
+                const isMatch = passwordInput.value === confirmPasswordInput.value;
+                passwordMatch.classList.toggle('match', isMatch);
+                matchText.textContent = isMatch ? 'Passwords match' : 'Passwords do not match';
+                confirmPasswordInput.classList.toggle('valid', isMatch);
+                confirmPasswordInput.classList.toggle('invalid', !isMatch);
+            }
+            validateForm();
+        });
+
+        confirmPasswordInput.addEventListener('input', () => {
+            const isMatch = passwordInput.value === confirmPasswordInput.value && confirmPasswordInput.value.length > 0;
+            passwordMatch.classList.toggle('match', isMatch);
+            matchText.textContent = isMatch ? 'Passwords match' : 'Passwords do not match';
+            confirmPasswordInput.classList.toggle('valid', isMatch);
+            confirmPasswordInput.classList.toggle('invalid', !isMatch);
+            validateForm();
+        });
+
+        // Add input listeners for all form fields
+        signupForm.querySelectorAll('input').forEach(input => {
+            input.addEventListener('input', validateForm);
+        });
+
+        // Prevent form submission if validation fails
+        signupForm.addEventListener('submit', (e) => {
+            if (!validateForm()) {
+                e.preventDefault();
+                // Show error message
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'alert alert-danger';
+                errorDiv.textContent = 'Please fix all validation errors before submitting.';
+                errorDiv.style.position = 'relative';
+                errorDiv.style.top = '0';
+                errorDiv.style.transform = 'none';
+                signupForm.insertBefore(errorDiv, signupForm.firstChild);
+                
+                setTimeout(() => errorDiv.remove(), 5000);
+            }
+        });
+
+        // Initial validation
+        validateForm();
     }
+
     const loginPwd = document.getElementById('login-password');
     const loginToggle = document.getElementById('login-show');
     if (loginPwd && loginToggle) {

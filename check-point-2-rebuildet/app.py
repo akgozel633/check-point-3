@@ -3,6 +3,9 @@ import os
 import urllib.request
 import urllib.parse
 import sqlite3
+import re
+import random
+import string
 from flask import Flask, render_template, request, redirect, url_for, flash, g, session
 from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -46,6 +49,12 @@ def init_db():
         )
     ''')
 
+    # Add owner_id column if it doesn't exist (for existing databases)
+    cur.execute('PRAGMA table_info(recipes)')
+    columns = [row[1] for row in cur.fetchall()]
+    if 'owner_id' not in columns:
+        cur.execute('ALTER TABLE recipes ADD COLUMN owner_id INTEGER')
+
     cur.execute('''
         CREATE TABLE IF NOT EXISTS users (
             id INTEGER PRIMARY KEY AUTOINCREMENT,
@@ -66,6 +75,55 @@ def init_db():
     db.commit()
 
 # ---------------- HELPERS ----------------
+
+def check_password_strength(password):
+    """
+    Check password strength and return (is_valid, score, errors).
+    Score: 0-5 (0=weak, 5=strong)
+    """
+    errors = []
+    score = 0
+    
+    if len(password) >= 8:
+        score += 1
+    else:
+        errors.append("At least 8 characters")
+    
+    if re.search(r'[A-Z]', password):
+        score += 1
+    else:
+        errors.append("At least one uppercase letter")
+    
+    if re.search(r'[a-z]', password):
+        score += 1
+    else:
+        errors.append("At least one lowercase letter")
+    
+    if re.search(r'\d', password):
+        score += 1
+    else:
+        errors.append("At least one number")
+    
+    if re.search(r'[!@#$%^&*(),.?":{}|<>]', password):
+        score += 1
+    else:
+        errors.append("At least one special character (!@#$%^&*...)")
+    
+    # Require minimum score of 4 for strong password
+    is_valid = score >= 4
+    return is_valid, score, errors
+
+def generate_captcha():
+    """Generate a simple math captcha with addition only."""
+    a = random.randint(1, 20)
+    b = random.randint(1, 20)
+    
+    answer = a + b
+    question = f"{a} + {b} = ?"
+    
+    # Store answer in session
+    session['captcha_answer'] = answer
+    return question
 
 def row_to_recipe(row):
     return {
@@ -257,25 +315,65 @@ def create():
 
 @app.route('/signup', methods=['GET','POST'])
 def signup():
-    if request.method == 'POST':
-        username = request.form.get('username','').strip()
-        password = request.form.get('password','')
+    if request.method == 'GET':
+        # Generate new captcha only for page loads
+        captcha_question = generate_captcha()
+        return render_template("signup.html", captcha_question=captcha_question, current_user=get_current_user())
+    
+    # POST request - process form
+    username = request.form.get('username','').strip()
+    password = request.form.get('password','')
+    confirm_password = request.form.get('confirm_password','')
+    captcha_input = request.form.get('captcha','')
 
-        if not username or not password:
-            flash("Username and password required.", "danger")
-            return redirect(url_for('signup'))
+    if not username or not password:
+        flash("Username and password required.", "danger")
+        # Generate new captcha for the retry
+        captcha_question = generate_captcha()
+        return render_template("signup.html", captcha_question=captcha_question, username=username, current_user=get_current_user())
 
-        try:
-            cur = get_db().cursor()
-            cur.execute("INSERT INTO users (username,password_hash) VALUES (?,?)",
-                        (username, generate_password_hash(password)))
-            get_db().commit()
-            flash("Account created! Please log in.", "success")
-            return redirect(url_for('login'))
-        except sqlite3.IntegrityError:
-            flash("Username already exists.", "danger")
+    # Check password strength
+    is_valid, score, errors = check_password_strength(password)
+    
+    if not is_valid:
+        for error in errors:
+            flash(error, "warning")
+        # Generate new captcha for the retry
+        captcha_question = generate_captcha()
+        return render_template("signup.html", captcha_question=captcha_question, username=username, current_user=get_current_user())
+    
+    if password != confirm_password:
+        flash("Passwords do not match!", "danger")
+        # Generate new captcha for the retry
+        captcha_question = generate_captcha()
+        return render_template("signup.html", captcha_question=captcha_question, username=username, current_user=get_current_user())
+    
+    # Check captcha
+    stored_answer = session.get('captcha_answer')
+    try:
+        if int(captcha_input) != stored_answer:
+            flash("Incorrect captcha answer. Please try again.", "danger")
+            # Generate new captcha for the retry
+            captcha_question = generate_captcha()
+            return render_template("signup.html", captcha_question=captcha_question, username=username, current_user=get_current_user())
+    except (ValueError, TypeError):
+        flash("Please enter a valid captcha answer.", "danger")
+        # Generate new captcha for the retry
+        captcha_question = generate_captcha()
+        return render_template("signup.html", captcha_question=captcha_question, username=username, current_user=get_current_user())
 
-    return render_template("signup.html", current_user=get_current_user())
+    try:
+        cur = get_db().cursor()
+        cur.execute("INSERT INTO users (username,password_hash) VALUES (?,?)",
+                    (username, generate_password_hash(password)))
+        get_db().commit()
+        flash("Account created! Please log in.", "success")
+        return redirect(url_for('login'))
+    except sqlite3.IntegrityError:
+        flash("Username already exists.", "danger")
+        # Generate new captcha for the retry
+        captcha_question = generate_captcha()
+        return render_template("signup.html", captcha_question=captcha_question, username=username, current_user=get_current_user())
 
 @app.route('/login', methods=['GET','POST'])
 def login():

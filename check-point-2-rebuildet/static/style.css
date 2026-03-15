@@ -372,6 +372,197 @@ body {
     50% { border-color: transparent; }
 }
 
+/* === Password Strength Indicator === */
+.password-strength-container {
+    margin-top: 0.5rem;
+}
+
+.password-strength-bar {
+    width: 100%;
+    height: 8px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.password-strength-fill {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease, background-color 0.3s ease;
+    border-radius: 4px;
+}
+
+.password-strength-fill.weak {
+    width: 20%;
+    background-color: #e74c3c;
+}
+
+.password-strength-fill.fair {
+    width: 40%;
+    background-color: #f39c12;
+}
+
+.password-strength-fill.good {
+    width: 60%;
+    background-color: #f1c40f;
+}
+
+.password-strength-fill.strong {
+    width: 80%;
+    background-color: #2ecc71;
+}
+
+.password-strength-fill.very-strong {
+    width: 100%;
+    background-color: #27ae60;
+}
+
+.password-strength-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.password-strength-text.weak {
+    color: #e74c3c;
+}
+
+.password-strength-text.fair {
+    color: #f39c12;
+}
+
+.password-strength-text.good {
+    color: #f1c40f;
+}
+
+.password-strength-text.strong {
+    color: #2ecc71;
+}
+
+.password-strength-text.very-strong {
+    color: #27ae60;
+}
+
+/* Password Requirements */
+.password-requirements {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #ddd;
+}
+
+.requirement {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+    color: #666;
+    transition: color 0.3s ease;
+}
+
+.requirement:last-child {
+    margin-bottom: 0;
+}
+
+.requirement i {
+    margin-right: 0.5rem;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.requirement.met {
+    color: #27ae60;
+}
+
+.requirement.met i {
+    color: #27ae60;
+}
+
+.requirement.met i.fa-times-circle::before {
+    content: "\f058"; /* Check circle icon */
+}
+
+/* Password Match Indicator */
+.password-match {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    color: #e74c3c;
+    transition: color 0.3s ease;
+}
+
+.password-match.match {
+    color: #27ae60;
+}
+
+.password-match i {
+    margin-right: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.password-match.match i.fa-times-circle::before {
+    content: "\f058"; /* Check circle icon */
+}
+
+/* Form validation styles */
+.form-input.invalid {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+}
+
+.form-input.valid {
+    border-color: #27ae60;
+    box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.2);
+}
+
+/* Password Input Container */
+.password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input-container .form-input {
+    padding-right: 45px; /* Space for the toggle button */
+}
+
+/* Password Toggle Button */
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+    z-index: 10;
+}
+
+.password-toggle:hover {
+    color: var(--primary);
+    background-color: rgba(16, 44, 38, 0.1);
+}
+
+.password-toggle:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.password-toggle i {
+    font-size: 1rem;
+}
+
+/* Captcha styling */
+.form-group label strong {
+    color: var(--primary);
+    font-weight: 700;
+}
+
 .ai-close {
     background: none;
     border: none;
