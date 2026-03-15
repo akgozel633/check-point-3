@@ -4,69 +4,145 @@
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>RecipeLog Pro</title>
-    
-    <!-- Font Awesome for icons -->
     <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.1/css/all.min.css">
-    
-    <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css2?family=Montserrat:wght@700&family=Open+Sans:wght@400;600&display=swap" rel="stylesheet">
-    
-    <!-- Main CSS -->
     <link rel="stylesheet" href="{{ url_for('static', filename='style.css') }}">
 </head>
-
 <body>
-
-<!-- NAVBAR -->
-<nav class="navbar">
-    <div class="nav-container">
-        <a href="{{ url_for('home') }}" class="logo">🍳 RecipeLog</a>
-
-        {% if session.get('accepted_welcome') %}
-        <div class="nav-links">
-            <a href="{{ url_for('home') }}" class="{{ 'active' if request.endpoint == 'home' }}">Home</a>
-            <a href="{{ url_for('search_online') }}" class="{{ 'active' if request.endpoint == 'search_online' }}">🔍 Search Web</a>
-            <a href="{{ url_for('create') }}" class="nav-btn {{ 'active' if request.endpoint == 'create' }}">Add Recipe</a>
-        </div>
-
-        <div class="nav-auth">
-            {% if current_user %}
-                <span class="muted">Hello, {{ current_user.username }}</span>
-                <a href="{{ url_for('history') }}" class="nav-btn-secondary">History</a>
-                <a href="{{ url_for('logout') }}" class="nav-btn">Sign Out</a>
-            {% else %}
-                <a href="{{ url_for('signup') }}" class="nav-btn-outline">Sign Up</a>
-                <a href="{{ url_for('login') }}" class="nav-btn">Sign In</a>
+    <nav class="navbar">
+        <div class="nav-container">
+            <a href="{{ url_for('home') }}" class="logo">🍳 RecipeLog</a>
+            {% if session.get('accepted_welcome') %}
+                <div class="nav-links">
+                    <a href="{{ url_for('home') }}" class="{{ 'active' if request.endpoint == 'home' }}">Home</a>
+                    <a href="{{ url_for('search_online') }}" class="{{ 'active' if request.endpoint == 'search_online' }}">🔍 Search Web</a>
+                    <a href="{{ url_for('create') }}" class="nav-btn">Add Recipe</a>
+                </div>
+                <div class="nav-auth">
+                    {% if current_user %}
+                        <span class="muted">Hello, {{ current_user.username }}</span>
+                        <a href="{{ url_for('history') }}">History</a>
+                        <a href="{{ url_for('logout') }}" class="nav-btn">Sign Out</a>
+                    {% else %}
+                        <a href="{{ url_for('signup') }}">Sign Up</a>
+                        <a href="{{ url_for('login') }}" class="nav-btn">Log In</a>
+                    {% endif %}
+                </div>
             {% endif %}
         </div>
-        {% endif %}
+    </nav>
+
+    <div class="container">
+        {% with messages = get_flashed_messages(with_categories=true) %}
+          {% if messages %}
+            {% for category, message in messages %}
+              <div class="alert alert-{{ category }} animate-pop">
+                  {{ message }}
+              </div>
+            {% endfor %}
+          {% endif %}
+        {% endwith %}
+
+        {% block content %}{% endblock %}
     </div>
-</nav>
 
-<!-- MAIN CONTAINER -->
-<div class="container">
+    <footer style="text-align: center; padding: 2rem; color: #888; font-size: 0.9rem;">
+        &copy; 2026 RecipeLog Pro | Built with Flask
+    </footer>
 
-    <!-- Flash Messages -->
-    {% with messages = get_flashed_messages(with_categories=true) %}
-    {% if messages %}
-        {% for category, message in messages %}
-        <div class="alert alert-{{ category }} animate-pop">
-            {{ message }}
+{% if session.show_chef %}
+<!-- 👨‍🍳 CHEF SIDEBAR (appears ONLY after login) -->
+<div id="chef-sidebar" class="chef-sidebar">
+    <div class="chef-inner">
+        <!-- Chef Image (full size) -->
+        <img src="https://images.unsplash.com/photo-1504674900247-0877df9cc836?q=80&w=1000" 
+             alt="Chef" class="chef-img">
+        
+        <div class="chef-quote">
+            <h4>📝 Chef’s Pro Tip</h4>
+            <p>{{ session.chef_tip }}</p>   <!-- Tip stored at login -->
         </div>
-        {% endfor %}
-    {% endif %}
-    {% endwith %}
-
-    {% block content %}{% endblock %}
+        
+        <button id="close-chef" class="btn btn-sm btn-outline-dark">
+            ✕ Close
+        </button>
+    </div>
 </div>
 
-<!-- FOOTER -->
-<footer class="footer">
-    © 2026 RecipeLog Pro | Built with Flask
-</footer>
+<style>
+/* ---------- CHEF SIDEBAR (RIGHT SIDE) ---------- */
+.chef-sidebar {
+    position: fixed;
+    top: 0;
+    right: 0;
+    height: 100vh;               /* FULL HEIGHT */
+    width: 420px;                /* ADJUST WIDTH HERE */
+    background: #fff;
+    box-shadow: -12px 0 30px rgba(0,0,0,0.25);
+    z-index: 9999;               /* ON TOP OF EVERYTHING */
+    padding: 2rem;
+    overflow-y: auto;
+    transform: translateX(100%); /* START OFF‑SCREEN */
+    transition: transform 0.5s ease-in-out;
+}
 
-<!-- JS -->
-<script src="{{ url_for('static', filename='main.js') }}"></script>
+/* SHOW THE SIDEBAR */
+.chef-sidebar.active {
+    transform: translateX(0);    /* SLIDE IN FROM RIGHT */
+}
 
+.chef-img {
+    width: 180px;
+    height: 180px;
+    border-radius: 50%;
+    object-fit: cover;
+    margin: 0 auto 2rem;
+    display: block;
+    border: 4px solid #ffeeba;
+}
+
+.chef-quote {
+    text-align: center;
+    font-size: 1.2rem;
+    line-height: 1.7;
+    color: #222;
+}
+
+.chef-quote h4 {
+    color: #d9480f;
+    margin-bottom: 1rem;
+}
+
+#close-chef {
+    position: absolute;
+    top: 1rem;
+    right: 1rem;
+    padding: 0.3rem 0.8rem;
+}
+</style>
+
+<script>
+document.addEventListener('DOMContentLoaded', () => {
+    const sidebar = document.getElementById('chef-sidebar');
+    const closeBtn = document.getElementById('close-chef');   // <-- TYPO FIXED HERE!
+
+    // Show chef after login
+    sidebar.classList.add('active');
+
+    // CLOSE BUTTON
+    closeBtn.addEventListener('click', () => {
+        sidebar.classList.remove('active');
+        
+        // ✅ CORRECT URL BUILDING
+        fetch("{{ url_for('clear_chef_flag') }}", { 
+            method: 'POST',
+            headers: { 'X-Requested-With': 'XMLHttpRequest' } // optional but recommended
+        })
+        .catch(e => console.error("Error clearing chef flag", e));
+    });
+});
+</script>
+{% endif %}
+    <script src="{{ url_for('static', filename='main.js') }}"></script>
 </body>
 </html>
