@@ -1,11 +1,10 @@
 import json
-import os
 import urllib.request
 import urllib.parse
 import sqlite3
 import re
 import random
-import string
+from datetime import datetime
 from flask import Flask, render_template, request, redirect, url_for, flash, g, session
 from uuid import uuid4
 from werkzeug.security import generate_password_hash, check_password_hash
@@ -71,6 +70,15 @@ def init_db():
             timestamp DATETIME DEFAULT CURRENT_TIMESTAMP
         )
     ''')
+
+    # ---- MIGRATION: add columns for structured history ----
+    cur.execute('PRAGMA table_info(search_history)')
+    cols = [row[1] for row in cur.fetchall()]
+
+    if 'search_query' not in cols:
+        cur.execute('ALTER TABLE search_history ADD COLUMN search_query TEXT')
+    if 'ingredients' not in cols:
+        cur.execute('ALTER TABLE search_history ADD COLUMN ingredients TEXT')
 
     db.commit()
 
@@ -147,13 +155,42 @@ def get_current_user():
     row = cur.fetchone()
     return {'id': row['id'], 'username': row['username']} if row else None
 
-def load_recipes():
+def load_recipes(favorite=None, ingredient=None, search_query=None):
+    """
+    Загружает рецепты для текущего пользователя с возможностью фильтрации.
+    """
     user = get_current_user()
     if not user:
         return []
+
     cur = get_db().cursor()
-    cur.execute('SELECT * FROM recipes WHERE owner_id=? ORDER BY name', (user['id'],))
+
+    # Базовый SQL-запрос
+    sql = "SELECT * FROM recipes WHERE owner_id=?"
+    params = [user['id']]
+
+    # Добавляем фильтры в запрос, если они есть
+    if favorite is not None:
+        sql += " AND favorite=?"
+        params.append(1 if favorite else 0)
+
+    if ingredient:
+        sql += " AND ingredients LIKE ?"
+        params.append(f"%{ingredient}%")
+
+    if search_query:
+        # Ищем по названию ИЛИ по ингредиентам
+        sql += " AND (name LIKE ? OR ingredients LIKE ?)"
+        like_query = f"%{search_query}%"
+        params.extend([like_query, like_query])
+
+    # Добавляем сортировку
+    sql += " ORDER BY name"
+
+    # Выполняем запрос
+    cur.execute(sql, params)
     rows = cur.fetchall()
+
     return [row_to_recipe(r) for r in rows]
 
 def add_recipe_to_db(recipe):
@@ -180,7 +217,32 @@ def add_recipe_to_db(recipe):
 def home():
     if session.get('boot_id') != APP_BOOT_ID:
         return redirect(url_for('welcome'))
-    return render_template('index.html', recipes=load_recipes(), current_user=get_current_user())
+    
+
+    favorite_filter   = request.args.get('favorite')   # "yes" or "no"
+    ingredient_filter = request.args.get('ingredient') 
+    search_query      = request.args.get('q')           # offline search term
+
+    # Convert favorite_filter to Boolean (None = no filter)
+    favorite = None
+    if favorite_filter == 'yes':
+        favorite = True
+    elif favorite_filter == 'no':
+        favorite = False
+
+    recipes = load_recipes(
+        favorite=favorite,
+        ingredient=ingredient_filter,
+        search_query=search_query
+    )
+
+
+    return render_template('index.html',         
+        recipes=recipes, 
+        current_user=get_current_user(),
+        fav_filter=favorite_filter,
+        ing_filter=ingredient_filter,
+        search_q=search_query)
 
 # ---------------- SEARCH ----------------
 
@@ -192,20 +254,26 @@ def fetch_from_mealdb(url):
     except:
         return None
 
-@app.route('/search', methods=['GET','POST'])
+@app.route('/search', methods=['GET', 'POST'])
 def search_online():
     results = []
     query = ""
     ingredients = ""
 
+    # 1) Берём данные либо из POST (форма), либо из GET (Search Again)
     if request.method == 'POST':
-        query = request.form.get('search_query','').strip()
-        ingredients = request.form.get('ingredients','').strip()
+        query = (request.form.get('search_query') or "").strip()
+        ingredients = (request.form.get('ingredients') or "").strip()
+    else:
+        query = (request.args.get('search_query') or "").strip()
+        ingredients = (request.args.get('ingredients') or "").strip()
 
-        if not query and not ingredients:
-            flash("Enter a recipe name or ingredient.", "warning")
-            return render_template("search.html", results=[], query=query, ingredients=ingredients)
+    # Нормализуем пустые строки -> ""
+    query = query.strip()
+    ingredients = ingredients.strip()
 
+    # 2) Если есть что искать — выполняем поиск (и на GET тоже)
+    if query or ingredients:
         data = None
 
         # Search by recipe name
@@ -227,12 +295,9 @@ def search_online():
                 else:
                     data = ing_data
 
-        if data and data.get("meals"):
-            results = data["meals"]
-        else:
-            results = []
+        results = data.get("meals") if data and data.get("meals") else []
 
-        # Also include any local recipes (created/saved by the current user)
+        # Add local results
         user = get_current_user()
         if user:
             cur = get_db().cursor()
@@ -272,19 +337,28 @@ def search_online():
         if not results:
             flash("No recipes found.", "warning")
 
-        # Save search history
-        try:
-            cur = get_db().cursor()
-            cur.execute(
-                "INSERT INTO search_history (user_id, query) VALUES (?, ?)",
-                (user['id'] if user else None, f"{query} {ingredients}".strip())
-            )
-            get_db().commit()
-        except:
-            pass
+        # 3) Сохраняем историю ТОЛЬКО на POST (чтобы Search Again не плодил дубли)
+        if request.method == 'POST':
+            user = get_current_user()
+            if user:
+                combined = " | ".join([x for x in [query, ingredients] if x])  # legacy display if нужно
+                try:
+                    cur = get_db().cursor()
+                    cur.execute(
+                        "INSERT INTO search_history (user_id, query, search_query, ingredients) VALUES (?, ?, ?, ?)",
+                        (user['id'], combined, query or None, ingredients or None)
+                    )
+                    get_db().commit()
+                except:
+                    pass
 
-    return render_template("search.html", results=results, query=query, ingredients=ingredients, current_user=get_current_user())
-
+    return render_template(
+        "search.html",
+        results=results,
+        query=query,
+        ingredients=ingredients,
+        current_user=get_current_user()
+    )
 # ---------------- CREATE RECIPE ----------------
 
 @app.route('/create', methods=['GET','POST'])
@@ -421,12 +495,81 @@ def history():
     if not user:
         flash("Login required.", "warning")
         return redirect(url_for('login'))
-    cur = get_db().cursor()
-    cur.execute("SELECT query,timestamp FROM search_history WHERE user_id=? ORDER BY timestamp DESC",
-                (user['id'],))
-    rows = cur.fetchall()
-    return render_template("history.html", history=rows, current_user=user)
 
+    cur = get_db().cursor()
+    cur.execute("""
+        SELECT id, query, search_query, ingredients, timestamp
+        FROM search_history
+        WHERE user_id=?
+        ORDER BY timestamp DESC
+    """, (user['id'],))
+    rows = cur.fetchall()
+
+    items = []
+    for r in rows:
+        ts = r["timestamp"]
+        # SQLite обычно отдаёт 'YYYY-MM-DD HH:MM:SS' строкой
+        try:
+            dt = datetime.fromisoformat(ts) if ts else None
+        except:
+            dt = None
+
+        sq = r["search_query"]
+        ing = r["ingredients"]
+
+        # fallback для старых записей (если новые поля пустые)
+        if (not sq and not ing) and r["query"]:
+            sq = r["query"]
+
+        params = {}
+        if sq:
+            params["search_query"] = sq
+        if ing:
+            params["ingredients"] = ing
+
+        search_again_url = url_for("search_online", **params) if params else url_for("search_online")
+
+        items.append({
+            "id": r["id"],
+            "search_query": sq or "",
+            "ingredients": ing or "",
+            "date": dt.strftime("%d %b %Y") if dt else (ts.split(" ")[0] if ts else ""),
+            "time": dt.strftime("%H:%M") if dt else (ts.split(" ")[1][:5] if ts and " " in ts else ""),
+            "search_again_url": search_again_url
+        })
+
+    return render_template("history.html", history=items, current_user=user)
+
+@app.route('/clear_history', methods=['POST'])
+def clear_history():
+    user = get_current_user()
+    if not user:
+        flash("Login required.", "warning")
+        return redirect(url_for('login'))
+
+    cur = get_db().cursor()
+    cur.execute("DELETE FROM search_history WHERE user_id=?", (user['id'],))
+    get_db().commit()
+
+    flash("Your search history has been cleared.", "success")
+    return redirect(url_for('history'))
+
+@app.route('/delete_history/<int:history_id>', methods=['POST'])
+def delete_history(history_id):
+    user = get_current_user()
+    if not user:
+        flash("Login required.", "warning")
+        return redirect(url_for('login'))
+
+    cur = get_db().cursor()
+    cur.execute("DELETE FROM search_history WHERE id=? AND user_id=?", (history_id, user["id"]))
+    get_db().commit()
+
+    if cur.rowcount == 0:
+        flash("No history", "warning")
+
+    flash("Your search history has been cleared.", "success")
+    return redirect(url_for('history'))
 
 @app.route('/recipe/<recipe_id>')
 def view_recipe(recipe_id):

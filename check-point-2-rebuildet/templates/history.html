@@ -1,15 +1,110 @@
+{# templates/history.html #}
 {% extends 'base.html' %}
 
 {% block content %}
-<h2>Your Search History</h2>
-{% if history %}
-    <ul class="history-list">
-    {% for row in history %}
-        <li>{{ row['timestamp'] }} — {{ row['query'] }}</li>
-    {% endfor %}
-    </ul>
-{% else %}
-    <p>No searches yet.</p>
-{% endif %}
+<div class="history-wrap">
+  <div class="history-toolbar">
+    <h2 class="history-title">Your Search History</h2>
 
+    {% if history %}
+      <form action="{{ url_for('clear_history') }}" method="POST" class="history-toolbar-actions"
+            onsubmit="return confirm('Clear entire search history?');">
+        <button type="submit" class="btn-lite btn-danger-lite">Clear all</button>
+      </form>
+    {% endif %}
+  </div>
+
+  {% if history %}
+    <div class="history-panel table-scroll">
+      <table class="history-table">
+        <thead>
+          <tr>
+            <th style="width: 190px;">When</th>
+            <th>Search</th>
+            <th style="width: 220px; text-align:right;">Actions</th>
+          </tr>
+        </thead>
+
+        <tbody>
+          {% for row in history %}
+            {# Robustly read both "new" structured fields and legacy fields #}
+            {% set name = (row['search_query'] if row['search_query'] is defined and row['search_query'] else '') %}
+            {% set ing  = (row['ingredients']   if row['ingredients']   is defined and row['ingredients']   else '') %}
+            {% set legacy = (row['query'] if row['query'] is defined and row['query'] else '') %}
+
+            {% if row['timestamp'] is defined and row['timestamp'] %}
+              {% set when = row['timestamp'] %}
+            {% elif row['date'] is defined %}
+              {% set when = (row['date'] ~ (' ' ~ row['time'] if row['time'] is defined else '')) %}
+            {% else %}
+              {% set when = '' %}
+            {% endif %}
+
+            {# Build "search again" URL that matches exactly what user searched #}
+            {% if row['search_again_url'] is defined and row['search_again_url'] %}
+              {% set again_url = row['search_again_url'] %}
+            {% else %}
+              {% if name and ing %}
+                {% set again_url = url_for('search_online', search_query=name, ingredients=ing) %}
+              {% elif name %}
+                {% set again_url = url_for('search_online', search_query=name) %}
+              {% elif ing %}
+                {% set again_url = url_for('search_online', ingredients=ing) %}
+              {% elif legacy %}
+                {# fallback: old combined field goes into name search #}
+                {% set again_url = url_for('search_online', search_query=legacy) %}
+              {% else %}
+                {% set again_url = url_for('search_online') %}
+              {% endif %}
+            {% endif %}
+
+            <tr>
+              <td data-label="When" class="history-when">
+                {{ when }}
+              </td>
+
+              <td data-label="Search">
+                <div class="history-chips">
+                  {% if name %}
+                    <span class="chip chip--name">Name: {{ name }}</span>
+                  {% endif %}
+                  {% if ing %}
+                    <span class="chip chip--ing">Ingredient: {{ ing }}</span>
+                  {% endif %}
+
+                  {# If this is an old row with only legacy query text #}
+                  {% if (not name) and (not ing) and legacy %}
+                    <span class="chip">Query: {{ legacy }}</span>
+                  {% endif %}
+
+                  {% if (not name) and (not ing) and (not legacy) %}
+                    <span class="chip">—</span>
+                  {% endif %}
+                </div>
+              </td>
+
+              <td data-label="Actions" class="history-actions-cell">
+                <div class="history-actions">
+                  <a class="btn-lite" href="{{ again_url }}">Search again</a>
+
+                  {# Per-item delete (endpoint name based on earlier code) #}
+                  <form action="{{ url_for('delete_history', history_id=row['id']) }}" method="POST"
+                        onsubmit="return confirm('Delete this history item?');">
+                    <button type="submit" class="btn-lite btn-danger-lite">Delete</button>
+                  </form>
+                </div>
+              </td>
+            </tr>
+          {% endfor %}
+        </tbody>
+      </table>
+    </div>
+
+  {% else %}
+    <div class="empty-card">
+      <h3>No searches yet</h3>
+      <p>Your search history will appear here.</p>
+    </div>
+  {% endif %}
+</div>
 {% endblock %}

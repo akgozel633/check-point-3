@@ -572,3 +572,409 @@ body {
     margin-left: 5px;
 }
 
+/* General page header styling */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* Styling for the filter and search box */
+/* Контейнер для всей формы фильтра */
+
+
+.filter-form {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Расстояние между группой инпутов и кнопкой "Reset" */
+}
+
+/* Основная группа с инпутами и кнопкой "Filter" */
+.input-group-modern {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #dfe1e5;
+    border-radius: 24px; /* Делает группу скругленной */
+    padding: 5px 8px;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    transition: box-shadow 0.2s;
+}
+
+.input-group-modern:hover,
+.input-group-modern:focus-within {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+}
+
+/* Оболочка для иконки и инпута */
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    flex-grow: 1; /* Позволяет инпутам занимать доступное место */
+}
+
+/* Стили для иконок */
+.input-wrapper .fa-solid {
+    color: #80868b;
+    margin: 0 10px;
+}
+
+/* Новые стили для инпутов и селекта */
+.form-control-modern {
+    border: none;
+    background: none;
+    padding: 8px 0;
+    height: 38px;
+    font-size: 16px;
+    width: 100%;
+    outline: none; /* Убираем стандартную обводку при фокусе */
+}
+
+.form-control-modern::placeholder {
+    color: #80868b;
+}
+
+/* Вертикальный разделитель между полями */
+.divider {
+    width: 1px;
+    background-color: #dfe1e5;
+    height: 24px;
+    margin: 0 5px;
+}
+
+/* Кнопка "Filter" */
+.btn-filter {
+    background-color: #3879E8; /* Пример цвета, можете выбрать свой */
+    color: white;
+    border: none;
+    border-radius: 18px;
+    padding: 0 24px;
+    height: 36px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-left: 10px;
+}
+
+.btn-filter:hover {
+    background-color: #3367D6;
+}
+
+/* Кнопка сброса */
+.btn-reset {
+    font-size: 14px;
+    color: #666;
+    text-decoration: none;
+    white-space: nowrap; /* Чтобы текст не переносился */
+    background: #f2f2f2;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.btn-reset:hover {
+    color: #333;
+    background-color: #e0e0e0;
+}
+
+
+
+/* Адаптивная сетка для карточек рецептов */
+.recipe-grid {
+    display: grid;
+    /* 
+     * Эта магия создает колонки:
+     * - auto-fill: заполнять ряд как можно большим количеством колонок.
+     * - minmax(280px, 1fr): каждая колонка будет минимум 280px.
+     *   Если место позволяет, они будут равномерно растягиваться.
+     *   На большинстве экранов это даст 3-4 колонки.
+    */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem; /* Расстояние между карточками */
+}
+
+/* 
+ * Важно! Убедитесь, что контейнер с фильтром растягивается на всю ширину сетки.
+ * Без этого он станет первой ячейкой грида, и карточки "поедут".
+*/
+.filter-container {
+    grid-column: 1 / -1; /* Растянуть элемент от первой до последней колонки грида */
+    margin-bottom: 2rem;
+}
+
+/* Стили для самих карточек (просто для полноты) */
+.recipe-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+/* Если рецепты не найдены, этот блок также должен занимать всю ширину */
+.no-recipes-found {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    background: #f8f9fa;
+    border-radius: 15px;
+}
+
+/* --- Стили для страницы истории --- */
+
+.page-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.page-header h1 {
+    margin: 0;
+}
+
+/* Контейнер для таблицы с тенью и скруглением */
+.table-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    overflow: hidden; /* Важно для скругления углов таблицы */
+}
+
+/* Стили для самой таблицы */
+.history-table {
+    width: 100%;
+    border-collapse: collapse; /* Убирает двойные рамки */
+}
+
+.history-table th,
+.history-table td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Заголовки таблицы */
+.history-table thead {
+    background-color: #f8f9fa;
+}
+
+.history-table th {
+    font-weight: 600;
+    color: #343a40;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+/* Строки таблицы */
+.history-table tbody tr:last-child td {
+    border-bottom: none; /* Убираем рамку у последней строки */
+}
+
+.history-table tbody tr:hover {
+    background-color: #f5f5f5; /* Подсветка строки при наведении */
+}
+
+.history-table td strong {
+    color: #0056b3; /* Выделяем поисковый запрос */
+}
+
+/* Стили для кнопок в таблице */
+.btn-sm.btn-secondary {
+    font-size: 13px;
+    padding: 5px 10px;
+}
+
+/* Стили для пустого состояния (когда истории нет) */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.empty-state .fa-solid {
+    font-size: 48px;
+    color: #ced4da;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #6c757d;
+}
+
+.actions-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Расстояние между кнопками */
+}
+.actions-cell form {
+    margin: 0; /* Убираем лишние отступы у формы */
+}
+.text-muted {
+    color: #888;
+}
+
+/* ===== Search History (no bootstrap) ===== */
+.history-wrap{
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 18px 14px 28px;
+}
+
+.history-toolbar{
+  display:flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 6px 0 14px;
+}
+
+.history-title{
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: .2px;
+}
+
+.history-toolbar-actions{
+  margin: 0;
+}
+
+.history-panel{
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+  overflow: hidden;
+}
+
+.table-scroll{ overflow-x:auto; }
+
+.history-table{
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+.history-table thead th{
+  background: rgba(0,0,0,.03);
+  color: #404040;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+
+.history-table tbody td{
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  vertical-align: top;
+}
+
+.history-table tbody tr:hover{
+  background: rgba(0,0,0,.02);
+}
+
+.history-when{
+  white-space: nowrap;
+  color: #555;
+  font-size: 13px;
+}
+
+.history-chips{
+  display:flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip{
+  display:inline-flex;
+  align-items:center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  background: #f3f5f7;
+  border: 1px solid rgba(0,0,0,.07);
+  color: #222;
+}
+
+.chip--name{
+  background: #eef4ff;
+  border-color: rgba(52, 102, 255, .20);
+}
+
+.chip--ing{
+  background: #eaf8f0;
+  border-color: rgba(25, 135, 84, .22);
+  color: #146c43;
+}
+
+.history-actions-cell{ text-align: right; }
+
+.history-actions{
+  display:flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.history-actions form{ margin:0; }
+
+/* Small neutral button style that should fit your “old” design */
+.btn-lite{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 8px 11px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.16);
+  background: #fff;
+  color: #1f2d3d;
+  text-decoration:none;
+  font-size: 13px;
+  cursor:pointer;
+}
+
+.btn-lite:hover{
+  background: rgba(0,0,0,.03);
+}
+
+.btn-danger-lite{
+  border-color: rgba(220,53,69,.35);
+  color: #b02a37;
+}
+
+.btn-danger-lite:hover{
+  background: rgba(220,53,69,.08);
+}
+
+.empty-card{
+  background:#fff;
+  border: 1px dashed rgba(0,0,0,.18);
+  border-radius: 14px;
+  padding: 22px;
+  text-align:center;
+  color:#666;
+}
