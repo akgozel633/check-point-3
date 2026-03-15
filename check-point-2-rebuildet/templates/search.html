@@ -15,12 +15,12 @@
                    name="search_query"
                    placeholder="Search by recipe name..."
                    class="form-input"
-                   value="{{ query if query }}">
+                   value="{{ query or '' }}">
             <input type="text"
                    name="ingredients"
                    placeholder="Search by ingredient..."
                    class="form-input"
-                   value="{{ ingredients if ingredients }}">
+                   value="{{ ingredients or '' }}">
             <button type="submit" class="btn btn-primary">
                 🔎 Search
             </button>
