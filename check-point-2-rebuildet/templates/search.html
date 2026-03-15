@@ -3,108 +3,66 @@
 {% block content %}
 
 <div class="form-container" style="max-width: 900px; text-align: center;">
+
     <header class="form-header">
         <h1>Search the Web</h1>
         <p>Find recipes online and save them directly to your collection.</p>
     </header>
 
-```
-<form action="{{ url_for('search_online') }}" method="POST">
+    <form action="{{ url_for('search_online') }}" method="POST">
+        <div style="display:flex; flex-direction:column; gap:15px;">
+            <input type="text"
+                   name="search_query"
+                   placeholder="Search by recipe name..."
+                   class="form-input"
+                   value="{{ query if query }}">
+            <input type="text"
+                   name="ingredients"
+                   placeholder="Search by ingredient..."
+                   class="form-input"
+                   value="{{ ingredients if ingredients }}">
+            <button type="submit" class="btn btn-primary">
+                🔎 Search
+            </button>
+        </div>
+    </form>
 
-<div style="display:flex; flex-direction:column; gap:15px;">
-
-<input type="text"
-       name="search_query"
-       placeholder="Search by recipe name..."
-       class="form-input">
-
-<input type="text"
-       name="ingredients"
-       placeholder="Search by ingredient..."
-       class="form-input">
-
-<button type="submit" class="btn btn-primary">
-    🔎 Search
-</button>
-
-<<<<<<< HEAD
-</div>
-
-</form>
-
-{% if results %}
-    <h3 style="text-align:left;margin-bottom:1.5rem;">
-        Results
+    {% if query or ingredients %}
+    <h3 style="text-align:left; margin-bottom:1.5rem;">
+        Results for
+        {% if query %}"{{ query }}"{% endif %}
+        {% if ingredients %}{% if query %} + {% endif %}"{{ ingredients }}"{% endif %}
     </h3>
 
+    {% if results %}
     <div class="recipe-grid">
         {% for meal in results %}
-        <div class="recipe-card" style="min-height:auto;text-align:center;align-items:center;">
-
-            <img src="{{ meal.strMealThumb }}"
-                 alt="{{ meal.strMeal }}"
-                 style="width:100%;height:200px;object-fit:cover;border-radius:8px;margin-bottom:1rem;">
-
-            <span class="category-tag">{{ meal.strCategory or "Recipe" }}</span>
-
+        <div class="recipe-card" style="min-height:auto; text-align:center; align-items:center;">
+            <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}" style="width:100%; height:200px; object-fit:cover; border-radius:8px; margin-bottom:1rem;">
+            <span class="category-tag">{{ meal.strCategory if meal.strCategory else '' }}</span>
             <h3 style="font-size:1.3rem;">{{ meal.strMeal }}</h3>
 
-            <form action="{{ url_for('save_online', meal_id=meal.idMeal) }}" method="POST"
-                  style="margin-top:1rem;width:100%;">
-
-                <button type="submit" class="btn btn-primary"
-                        style="width:100%;justify-content:center;">
+            {% if current_user %}
+            <form action="{{ url_for('save_online', meal_id=meal.idMeal) }}" method="POST" style="margin-top:1rem; width:100%;">
+                <button type="submit" class="btn btn-primary" style="width:100%; justify-content:center;">
                     <i class="fa fa-download"></i> Save to Collection
                 </button>
-
             </form>
-
+            {% else %}
+            <button type="button" class="btn btn-primary" style="width:100%; justify-content:center;" disabled>
+                Log in or Sign Up to save
+            </button>
+            {% endif %}
         </div>
         {% endfor %}
     </div>
-
-{% elif request.method == 'POST' %}
+    {% else %}
     <div class="empty-state" style="padding:2rem;">
-        <p>No recipes found. Try another name or ingredient.</p>
+        <p>No recipes found. Try searching for a different name or ingredient!</p>
     </div>
-{% endif %}
-```
+    {% endif %}
+    {% endif %}
 
 </div>
-=======
-    {% if query %}
-        <h3 style="text-align: left; margin-bottom: 1.5rem;">Results for "{{ query }}"</h3>
-        
-        {% if results %}
-            <div class="recipe-grid">
-                {% for meal in results %}
-                <div class="recipe-card" style="min-height: auto; align-items: center; text-align: center;">
-                    <img src="{{ meal.strMealThumb }}" alt="{{ meal.strMeal }}" 
-                         style="width: 100%; height: 200px; object-fit: cover; border-radius: 8px; margin-bottom: 1rem;">
-                    
-                    <span class="category-tag">{{ meal.strCategory }}</span>
-                    <h3 style="font-size: 1.3rem;">{{ meal.strMeal }}</h3>
-                    
-                    {% if current_user %}
-                        <form action="{{ url_for('save_online', meal_id=meal.idMeal) }}" method="POST" style="margin-top: 1rem; width: 100%;">
-                            <button type="submit" class="btn btn-primary" style="width: 100%; justify-content: center;">
-                                <i class="fa fa-download"></i> Save to Collection
-                            </button>
-                        </form>
-                    {% else %}
-                        <button type="button" class="btn btn-primary" style="width: 100%; justify-content: center;" disabled>
-                            Log in or Sign Up to save
-                        </button>
-                    {% endif %}
-                </div>
-                {% endfor %}
-            </div>
-        {% else %}
-            <div class="empty-state" style="padding: 2rem;">
-                <p>No recipes found. Try searching for a different ingredient!</p>
-            </div>
-        {% endif %}
-    {% endif %}
-</div>
->>>>>>> 4d01233d23f28a0c486241340c818f5ac87e6c4e
+
 {% endblock %}

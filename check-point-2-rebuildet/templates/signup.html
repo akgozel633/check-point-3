@@ -1,66 +1,35 @@
 {% extends 'base.html' %}
 
 {% block content %}
-<<<<<<< HEAD
+
+<h2 style="text-align:center;">Sign Up</h2>
+
 <div class="form-container">
-    <h2>Sign Up</h2>
 
-    <form method="post" action="{{ url_for('signup') }}" autocomplete="off">
+<form method="post" action="{{ url_for('signup') }}" class="form">
 
-        <div class="form-group">
-            <label>Username</label>
-            <input class="form-input" type="text" name="username" required>
-        </div>
-
-        <div class="form-group">
-            <label>Password</label>
-            <input class="form-input" type="password" name="password" required>
-        </div>
-
-        <button type="submit" class="btn btn-primary">Create Account</button>
-
-    </form>
+<div class="form-group">
+<label>Username</label>
+<input class="form-input" type="text" name="username" required>
 </div>
 
-=======
-<h2>Sign Up</h2>
-<div class="form-container">
-  <form method="post" action="{{ url_for('signup') }}" class="form" id="signup-form">
-      <div class="form-group">
-          <label>Username</label>
-          <input class="form-input" type="text" name="username" required>
-      </div>
-      <div class="form-group" style="display:flex; gap:16px; align-items:flex-start;">
-          <div style="flex:1;">
-              <label>Password</label>
-              <div class="password-input-row">
-                  <input class="form-input" type="password" name="password" id="signup-password" required>
-                  <label class="show-toggle"><input type="checkbox" id="signup-show"> Show</label>
-              </div>
-              <div class="password-meter" id="signup-meter">
-                  <div class="password-meter-bar" id="signup-meter-bar"></div>
-              </div>
-          </div>
-          <div class="password-hints" id="signup-hints" style="flex:1;">
-              <div>Requirements:</div>
-              <ul>
-                  <li data-req="length">At least 8 characters</li>
-                  <li data-req="uppercase">Contains uppercase letter</li>
-                  <li data-req="lowercase">Contains lowercase letter</li>
-                  <li data-req="digit">Contains a digit</li>
-                  <li data-req="symbol">Contains a symbol</li>
-              </ul>
-          </div>
-      </div>
-      <div class="form-group">
-          <label>Captcha: Solve {{ captcha_question }}</label>
-          <input class="form-input" type="text" name="captcha" required>
-      </div>
-      <button type="submit" class="btn btn-primary">Create Account</button>
-      <div style="margin-top: 0.75rem;">
-          <a href="{{ url_for('login') }}">Or Log In</a>
-      </div>
-  </form>
+<div class="form-group">
+<label>Password</label>
+<input class="form-input" type="password" name="password" required>
 </div>
->>>>>>> 4d01233d23f28a0c486241340c818f5ac87e6c4e
+
+<button type="submit" class="btn btn-primary" style="width:100%; margin-top:10px;">
+Create Account
+</button>
+
+<div style="margin-top:15px; text-align:center;">
+<a href="{{ url_for('login') }}" class="btn btn-primary">
+Log In
+</a>
+</div>
+
+</form>
+
+</div>
+
 {% endblock %}
