@@ -1,292 +1,980 @@
 :root {
-    --primary: #102c26;
-    --light: #f7e7ce;
-    --white: #fffdfa;
-    --accent: #d4a373;
-    --danger: #8b0000;
-    --warning: #b8860b;
+    --primary: #102c26;
+    --light: #f7e7ce;
+    --white: #fffdfa;
+    --accent: #d4a373;
+    --danger: #8b0000;
+    --warning: #b8860b;
 }
 
 body {
-    font-family: 'Open Sans', sans-serif;
-    background: var(--light);
-    color: var(--primary);
-    margin: 0;
+    font-family: 'Open Sans', sans-serif;
+    background: var(--light);
+    color: var(--primary);
+    margin: 0;
 }
 
 .container {
-    max-width: 1100px;
-    margin: 2rem auto;
-    padding: 0 1.5rem;
+    max-width: 1100px;
+    margin: 2rem auto;
+    padding: 0 1.5rem;
 }
 
-/* --- NAVBAR --- */
+/* Navbar */
 .navbar {
-    background: var(--primary);
-    padding: 1rem 0;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    position: sticky;
-    top: 0;
-    z-index: 1000;
+    background: var(--primary);
+    padding: 1rem 0;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
 }
 
 .nav-container {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    max-width: 1100px;
-    margin: 0 auto;
-    padding: 0 1.5rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    max-width: 1100px;
+    margin: 0 auto;
+    padding: 0 1.5rem;
 }
 
 .logo {
-    color: var(--light);
-    font-family: 'Montserrat', sans-serif;
-    font-size: 1.6rem;
-    text-decoration: none;
-    font-weight: 700;
+    color: var(--light);
+    font-family: 'Montserrat', sans-serif;
+    font-size: 1.6rem;
+    text-decoration: none;
+    font-weight: 700;
 }
 
-/* Ссылки и Навигация Авторизации */
-.nav-links a, .nav-auth a {
-    color: var(--light);
-    text-decoration: none;
-    margin-left: 1.2rem;
-    font-weight: 600;
-    padding: 0.6rem 1rem;
-    border-radius: 8px;
-    transition: all 0.3s ease;
-    opacity: 0.8;
-    display: inline-block;
+.nav-links a {
+    color: var(--light);
+    text-decoration: none;
+    margin-left: 1.5rem;
+    font-weight: 600;
+    opacity: 0.8;
 }
 
-/* Эффект свечения при наведении для всех ссылок */
-.nav-links a:hover, .nav-auth a:hover {
-    background: var(--accent);
-    color: #fff !important;
-    opacity: 1;
-    box-shadow: 0 0 15px rgba(212, 163, 115, 0.4);
+.nav-links a:hover {
+    opacity: 1;
 }
 
-/* Стиль активной страницы */
-.nav-links a.active {
-    background: var(--accent);
-    color: #fff !important;
-    opacity: 1;
+.nav-btn {
+    background: var(--accent);
+    padding: 0.5rem 1rem;
+    border-radius: 5px;
+    color: #fff !important;
 }
 
-/* Стилизация кнопок регистрации и входа как сплошных кнопок */
-.nav-auth a[href*="signup"], .nav-btn {
-    background: var(--accent) !important;
-    color: #fff !important;
-    opacity: 1 !important;
-    font-weight: 700;
-}
-
-.nav-auth a[href*="signup"]:hover, .nav-btn:hover {
-    filter: brightness(1.1);
-    transform: translateY(-2px);
-    box-shadow: 0 5px 15px rgba(212, 163, 115, 0.5);
-}
-
-/* --- КОНТЕНТ --- */
-
+/* Header */
 .page-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 2rem;
-    border-bottom: 2px solid var(--accent);
-    padding-bottom: 1rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    border-bottom: 2px solid var(--accent);
+    padding-bottom: 1rem;
 }
 
+/* Forms */
+.form-container {
+    background: var(--white);
+    padding: 2rem;
+    border-radius: 15px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.05);
+    max-width: 600px;
+    margin: 0 auto;
+}
+
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-group label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: bold;
+}
+
+.form-input {
+    width: 100%;
+    padding: 0.8rem;
+    border: 1px solid #ccc;
+    border-radius: 8px;
+    font-family: inherit;
+    box-sizing: border-box;
+}
+
+/* Buttons */
 .btn {
-    padding: 0.8rem 1.5rem;
-    border-radius: 8px;
-    border: none;
-    cursor: pointer;
-    font-weight: 700;
-    font-family: inherit;
-    display: inline-flex;
-    align-items: center;
-    gap: 8px;
-    transition: 0.3s;
+    padding: 0.8rem 1.5rem;
+    border-radius: 8px;
+    border: none;
+    cursor: pointer;
+    font-weight: 700;
+    font-family: inherit;
+    display: inline-flex;
+    align-items: center;
+    gap: 8px;
 }
 
 .btn-primary {
-    background: var(--primary);
-    color: var(--light);
-    text-decoration: none;
+    background: var(--primary);
+    color: var(--light);
+    text-decoration: none;
 }
 
-.btn-primary:hover {
-    filter: brightness(1.3);
-}
-
-/* Сетка карточек рецептов */
+/* Recipe Cards Grid */
 .recipe-grid {
-    display: grid;
-    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
-    gap: 2.5rem;
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    gap: 2.5rem;
 }
 
 .recipe-card {
-    background: var(--white);
-    border-radius: 15px;
-    overflow: hidden;
-    border: 1px solid #e0d1b8;
-    transition: transform 0.4s ease, box-shadow 0.4s ease;
-    display: flex;
-    flex-direction: column;
+    background: var(--white);
+    border-radius: 15px;
+    overflow: hidden;
+    border: 1px solid #e0d1b8;
+    transition: transform 0.4s ease, box-shadow 0.4s ease;
+    display: flex;
+    flex-direction: column;
 }
 
 .recipe-card:hover {
-    transform: translateY(-8px);
-    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
+    transform: translateY(-8px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.1);
 }
 
 .card-img-wrapper {
-    position: relative;
-    height: 200px;
-    overflow: hidden;
+    position: relative;
+    height: 200px;
+    overflow: hidden;
 }
 
 .recipe-card-img {
-    width: 100%;
-    height: 100%;
-    object-fit: cover;
-    transition: transform 0.6s ease;
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s ease;
 }
 
 .recipe-card:hover .recipe-card-img {
-    transform: scale(1.1);
+    transform: scale(1.1);
 }
 
-/* Сердечко */
+/* Floating Heart Icon */
 .heart-container {
-    position: absolute;
-    top: 15px;
-    right: 15px;
-    background: white;
-    width: 40px;
-    height: 40px;
-    border-radius: 50%;
-    display: flex;
-    align-items: center;
-    justify-content: center;
-    cursor: pointer;
-    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
-    z-index: 10;
+    position: absolute;
+    top: 15px;
+    right: 15px;
+    background: white;
+    width: 40px;
+    height: 40px;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    cursor: pointer;
+    box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+    z-index: 10;
 }
 
 .fa-heart {
-    color: #ccc;
-    font-size: 1.3rem;
-    transition: color 0.3s ease;
+    color: #ccc;
+    font-size: 1.3rem;
+    transition: color 0.3s ease;
 }
 
 .fa-heart.active {
-    color: #e74c3c;
+    color: #e74c3c;
 }
 
 .card-info {
-    padding: 1.5rem;
-    flex-grow: 1;
+    padding: 1.5rem;
+    flex-grow: 1;
 }
 
 .category-tag {
-    font-size: 0.75rem;
-    color: var(--accent);
-    font-weight: 800;
-    text-transform: uppercase;
+    font-size: 0.75rem;
+    color: var(--accent);
+    font-weight: 800;
+    text-transform: uppercase;
 }
 
 .recipe-card h3 {
-    margin: 0.5rem 0;
-    color: var(--primary);
+    margin: 0.5rem 0;
+    color: var(--primary);
 }
 
 .rating {
-    color: var(--warning);
-    margin-top: 0.5rem;
+    color: var(--warning);
+    margin-top: 0.5rem;
 }
 
 .card-footer {
-    padding: 1rem 1.5rem;
-    background: #fdfaf5;
-    border-top: 1px solid #e0d1b8;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
+    padding: 1rem 1.5rem;
+    background: #fdfaf5;
+    border-top: 1px solid #e0d1b8;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
 }
 
 .btn-text {
-    color: var(--primary);
-    text-decoration: none;
-    font-weight: bold;
+    color: var(--primary);
+    text-decoration: none;
+    font-weight: bold;
 }
 
-.actions a, .actions button {
-    background: none;
-    border: none;
-    cursor: pointer;
-    margin-left: 10px;
-    font-size: 1.1rem;
-    text-decoration: none;
+.actions a {
+    text-decoration: none;
+    margin-left: 10px;
 }
 
 .edit-link { color: #2980b9; }
-.delete-btn, .delete-link { color: var(--danger); }
+.delete-link { color: var(--danger); }
 
-/* Уведомления */
+/* Alerts */
 .alert {
-    position: fixed;
-    top: 20px;
-    left: 50%;
-    transform: translateX(-50%);
-    z-index: 9999;
-    min-width: 300px;
-    padding: 15px 25px;
-    border-radius: 8px;
-    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
-    text-align: center;
-    background-color: #d4edda;
-    color: #155724;
-    border: 1px solid #c3e6cb;
+    position: fixed;        /* Makes it float above everything */
+    top: 20px;             /* Distance from the top */
+    left: 50%;             /* Move to the middle */
+    transform: translateX(-50%); /* Perfectly center it */
+    z-index: 9999;         /* Ensures it stays on top of images/cards */
+    
+    min-width: 300px;
+    padding: 15px 25px;
+    border-radius: 8px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.2);
+    text-align: center;
+    
+    /* Colors */
+    background-color: #d4edda; /* Light green */
+    color: #155724;           /* Dark green text */
+    border: 1px solid #c3e6cb;
+    
+    transition: opacity 0.5s ease, transform 0.5s ease;
 }
 
-/* AI Helper */
+/* Different color for errors */
+.alert-danger {
+    background-color: #f8d7da;
+    color: #721c24;
+    border-color: #f5c6cb;
+}
+
+.recipe-card.removing {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s, transform 0.4s;
+}
+
+/* Loading spinner (Font Awesome) */
+.fa-spinner {
+    margin-right: 6px;
+}
+
+/* Toast notifications */
+.toast {
+    position: fixed;
+    bottom: 20px;
+    right: 20px;
+    padding: 12px 20px;
+    border-radius: 6px;
+    color: white;
+    font-weight: 500;
+    z-index: 1000;
+    box-shadow: 0 4px 12px rgba(0,0,0,0.2);
+    transition: opacity 0.5s, transform 0.5s;
+    transform: translateY(0);
+}
+
+.toast-success { background: #28a745; }
+.toast-error   { background: #dc3545; }
+
+.toast.fade-out {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+/* Smooth card removal animation */
+.recipe-card.removing {
+    opacity: 0;
+    transform: translateY(20px);
+    transition: opacity 0.4s ease, transform 0.4s ease;
+}
+
+/* === AI Helper Styles === */
 .ai-helper {
-    position: fixed;
-    bottom: 20px;
-    right: -500px;
-    width: auto;
-    max-width: 350px;
-    background: transparent;
-    display: flex;
-    align-items: flex-start;
-    gap: 10px;
-    transition: right 0.8s ease;
-    z-index: 9999;
+    position: fixed;
+    bottom: 20px;
+    right: -500px;
+    width: auto;
+    max-width: 350px;
+    background: transparent; /* убираем белый квадрат позади */
+    display: flex;
+    align-items: flex-start;
+    gap: 10px;
+    transition: right 0.8s ease;
+    z-index: 9999;
 }
 
 .ai-helper.show {
-    right: 20px;
+    right: 20px;
+    animation: slideIn 1s ease-out;
 }
 
 .ai-avatar img {
-    width: 200px;
-    height: auto;
+    width: 200px;
+    height: auto;
 }
 
 .ai-message {
-    background: #fff;
-    border-radius: 12px;
-    padding: 0.8rem 1rem;
-    box-shadow: 0 4px 12px rgba(0, 30, 255, 0.849);
-    position: relative;
-    max-width: min(420px, 80vw);
-    line-height: 1.4;
-    word-wrap: break-word;
-    display: inline-block;
+    background: #fff;
+    border-radius: 12px;
+    padding: 0.8rem 1rem;
+    box-shadow: 0 4px 12px rgba(0, 30, 255, 0.849);
+    position: relative;
+    max-width: min(420px, 80vw); /* не шире 420px и не больше 80% экрана */
+    line-height: 1.4; /* делаем текст более читаемым */
+    word-wrap: break-word; /* переносим длинные слова */
+    display: inline-block; /* облачко подстраивается под текст */
+    
+}
+
+/* «хвостик» как в комиксах */
+.ai-message::after {
+    content: none;
+    position: absolute;
+    left: -10px;
+    bottom: 20px;
+    width: 0;
+    height: 0;
+    border-top: 10px solid transparent;
+    border-right: 10px solid #fff;
+    border-bottom: 10px solid transparent;
+}
+
+.ai-message p {
+    margin: 0;
+    font-size: 1rem;
+    color: #333;
+    white-space: normal; /* разрешаем перенос строк */
+}
+
+@keyframes typing {
+    from { width: 0; }
+    to { width: 100%; }
+}
+
+@keyframes blink {
+    50% { border-color: transparent; }
+}
+
+/* === Password Strength Indicator === */
+.password-strength-container {
+    margin-top: 0.5rem;
+}
+
+.password-strength-bar {
+    width: 100%;
+    height: 8px;
+    background-color: #e0e0e0;
+    border-radius: 4px;
+    overflow: hidden;
+    margin-bottom: 0.5rem;
+}
+
+.password-strength-fill {
+    height: 100%;
+    width: 0%;
+    transition: width 0.3s ease, background-color 0.3s ease;
+    border-radius: 4px;
+}
+
+.password-strength-fill.weak {
+    width: 20%;
+    background-color: #e74c3c;
+}
+
+.password-strength-fill.fair {
+    width: 40%;
+    background-color: #f39c12;
+}
+
+.password-strength-fill.good {
+    width: 60%;
+    background-color: #f1c40f;
+}
+
+.password-strength-fill.strong {
+    width: 80%;
+    background-color: #2ecc71;
+}
+
+.password-strength-fill.very-strong {
+    width: 100%;
+    background-color: #27ae60;
+}
+
+.password-strength-text {
+    font-size: 0.9rem;
+    font-weight: 600;
+    margin-bottom: 0.5rem;
+}
+
+.password-strength-text.weak {
+    color: #e74c3c;
+}
+
+.password-strength-text.fair {
+    color: #f39c12;
+}
+
+.password-strength-text.good {
+    color: #f1c40f;
+}
+
+.password-strength-text.strong {
+    color: #2ecc71;
+}
+
+.password-strength-text.very-strong {
+    color: #27ae60;
+}
+
+/* Password Requirements */
+.password-requirements {
+    margin-top: 0.5rem;
+    padding: 0.75rem;
+    background-color: #f8f9fa;
+    border-radius: 6px;
+    border-left: 4px solid #ddd;
+}
+
+.requirement {
+    display: flex;
+    align-items: center;
+    margin-bottom: 0.4rem;
+    font-size: 0.85rem;
+    color: #666;
+    transition: color 0.3s ease;
+}
+
+.requirement:last-child {
+    margin-bottom: 0;
+}
+
+.requirement i {
+    margin-right: 0.5rem;
+    font-size: 0.9rem;
+    transition: color 0.3s ease;
+}
+
+.requirement.met {
+    color: #27ae60;
+}
+
+.requirement.met i {
+    color: #27ae60;
+}
+
+.requirement.met i.fa-times-circle::before {
+    content: "\f058"; /* Check circle icon */
+}
+
+/* Password Match Indicator */
+.password-match {
+    margin-top: 0.5rem;
+    font-size: 0.85rem;
+    display: flex;
+    align-items: center;
+    color: #e74c3c;
+    transition: color 0.3s ease;
+}
+
+.password-match.match {
+    color: #27ae60;
+}
+
+.password-match i {
+    margin-right: 0.5rem;
+    transition: color 0.3s ease;
+}
+
+.password-match.match i.fa-times-circle::before {
+    content: "\f058"; /* Check circle icon */
+}
+
+/* Form validation styles */
+.form-input.invalid {
+    border-color: #e74c3c;
+    box-shadow: 0 0 0 2px rgba(231, 76, 60, 0.2);
+}
+
+.form-input.valid {
+    border-color: #27ae60;
+    box-shadow: 0 0 0 2px rgba(39, 174, 96, 0.2);
+}
+
+/* Password Input Container */
+.password-input-container {
+    position: relative;
+    display: flex;
+    align-items: center;
+}
+
+.password-input-container .form-input {
+    padding-right: 45px; /* Space for the toggle button */
+}
+
+/* Password Toggle Button */
+.password-toggle {
+    position: absolute;
+    right: 12px;
+    background: none;
+    border: none;
+    color: #666;
+    cursor: pointer;
+    padding: 8px;
+    border-radius: 4px;
+    transition: color 0.3s ease, background-color 0.3s ease;
+    z-index: 10;
+}
+
+.password-toggle:hover {
+    color: var(--primary);
+    background-color: rgba(16, 44, 38, 0.1);
+}
+
+.password-toggle:focus {
+    outline: 2px solid var(--accent);
+    outline-offset: 2px;
+}
+
+.password-toggle i {
+    font-size: 1rem;
+}
+
+/* Captcha styling */
+.form-group label strong {
+    color: var(--primary);
+    font-weight: 700;
+}
+
+.ai-close {
+    background: none;
+    border: none;
+    font-size: 1.5rem;
+    color: #333;
+    cursor: pointer;
+    margin-left: 5px;
+}
+
+/* General page header styling */
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+/* Styling for the filter and search box */
+/* Контейнер для всей формы фильтра */
+
+
+.filter-form {
+    display: flex;
+    align-items: center;
+    gap: 15px; /* Расстояние между группой инпутов и кнопкой "Reset" */
+}
+
+/* Основная группа с инпутами и кнопкой "Filter" */
+.input-group-modern {
+    display: flex;
+    align-items: center;
+    background-color: #fff;
+    border: 1px solid #dfe1e5;
+    border-radius: 24px; /* Делает группу скругленной */
+    padding: 5px 8px;
+    width: 100%;
+    box-shadow: 0 2px 5px rgba(0,0,0,0.08);
+    transition: box-shadow 0.2s;
+}
+
+.input-group-modern:hover,
+.input-group-modern:focus-within {
+    box-shadow: 0 4px 8px rgba(0,0,0,0.12);
+}
+
+/* Оболочка для иконки и инпута */
+.input-wrapper {
+    display: flex;
+    align-items: center;
+    flex-grow: 1; /* Позволяет инпутам занимать доступное место */
+}
+
+/* Стили для иконок */
+.input-wrapper .fa-solid {
+    color: #80868b;
+    margin: 0 10px;
+}
+
+/* Новые стили для инпутов и селекта */
+.form-control-modern {
+    border: none;
+    background: none;
+    padding: 8px 0;
+    height: 38px;
+    font-size: 16px;
+    width: 100%;
+    outline: none; /* Убираем стандартную обводку при фокусе */
+}
+
+.form-control-modern::placeholder {
+    color: #80868b;
+}
+
+/* Вертикальный разделитель между полями */
+.divider {
+    width: 1px;
+    background-color: #dfe1e5;
+    height: 24px;
+    margin: 0 5px;
+}
+
+/* Кнопка "Filter" */
+.btn-filter {
+    background-color: #3879E8; /* Пример цвета, можете выбрать свой */
+    color: white;
+    border: none;
+    border-radius: 18px;
+    padding: 0 24px;
+    height: 36px;
+    font-weight: 500;
+    cursor: pointer;
+    transition: background-color 0.2s;
+    margin-left: 10px;
+}
+
+.btn-filter:hover {
+    background-color: #3367D6;
+}
+
+/* Кнопка сброса */
+.btn-reset {
+    font-size: 14px;
+    color: #666;
+    text-decoration: none;
+    white-space: nowrap; /* Чтобы текст не переносился */
+    background: #f2f2f2;
+    padding: 8px 12px;
+    border-radius: 8px;
+    transition: background-color 0.2s;
+}
+
+.btn-reset:hover {
+    color: #333;
+    background-color: #e0e0e0;
+}
+
+
+
+/* Адаптивная сетка для карточек рецептов */
+.recipe-grid {
+    display: grid;
+    /* 
+     * Эта магия создает колонки:
+     * - auto-fill: заполнять ряд как можно большим количеством колонок.
+     * - minmax(280px, 1fr): каждая колонка будет минимум 280px.
+     *   Если место позволяет, они будут равномерно растягиваться.
+     *   На большинстве экранов это даст 3-4 колонки.
+    */
+    grid-template-columns: repeat(auto-fill, minmax(280px, 1fr));
+    gap: 1.5rem; /* Расстояние между карточками */
+}
+
+/* 
+ * Важно! Убедитесь, что контейнер с фильтром растягивается на всю ширину сетки.
+ * Без этого он станет первой ячейкой грида, и карточки "поедут".
+*/
+.filter-container {
+    grid-column: 1 / -1; /* Растянуть элемент от первой до последней колонки грида */
+    margin-bottom: 2rem;
+}
+
+/* Стили для самих карточек (просто для полноты) */
+.recipe-card {
+    background: #ffffff;
+    border: 1px solid #e0e0e0;
+    border-radius: 12px;
+    overflow: hidden;
+    display: flex;
+    flex-direction: column;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+/* Если рецепты не найдены, этот блок также должен занимать всю ширину */
+.no-recipes-found {
+    grid-column: 1 / -1;
+    text-align: center;
+    padding: 3rem;
+    background: #f8f9fa;
+    border-radius: 15px;
+}
+
+/* --- Стили для страницы истории --- */
+
+.page-container {
+    max-width: 900px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+.page-header {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 2rem;
+    padding-bottom: 1rem;
+    border-bottom: 1px solid #e0e0e0;
+}
+
+.page-header h1 {
+    margin: 0;
+}
+
+/* Контейнер для таблицы с тенью и скруглением */
+.table-container {
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+    overflow: hidden; /* Важно для скругления углов таблицы */
+}
+
+/* Стили для самой таблицы */
+.history-table {
+    width: 100%;
+    border-collapse: collapse; /* Убирает двойные рамки */
+}
+
+.history-table th,
+.history-table td {
+    padding: 16px 20px;
+    text-align: left;
+    border-bottom: 1px solid #f0f0f0;
+}
+
+/* Заголовки таблицы */
+.history-table thead {
+    background-color: #f8f9fa;
+}
+
+.history-table th {
+    font-weight: 600;
+    color: #343a40;
+    text-transform: uppercase;
+    font-size: 12px;
+    letter-spacing: 0.5px;
+}
+
+/* Строки таблицы */
+.history-table tbody tr:last-child td {
+    border-bottom: none; /* Убираем рамку у последней строки */
+}
+
+.history-table tbody tr:hover {
+    background-color: #f5f5f5; /* Подсветка строки при наведении */
+}
+
+.history-table td strong {
+    color: #0056b3; /* Выделяем поисковый запрос */
+}
+
+/* Стили для кнопок в таблице */
+.btn-sm.btn-secondary {
+    font-size: 13px;
+    padding: 5px 10px;
+}
+
+/* Стили для пустого состояния (когда истории нет) */
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+    background-color: #fff;
+    border-radius: 8px;
+    box-shadow: 0 4px 8px rgba(0,0,0,0.05);
+}
+
+.empty-state .fa-solid {
+    font-size: 48px;
+    color: #ced4da;
+    margin-bottom: 1rem;
+}
+
+.empty-state h3 {
+    margin-bottom: 0.5rem;
+}
+
+.empty-state p {
+    color: #6c757d;
+}
+
+.actions-cell {
+    display: flex;
+    align-items: center;
+    gap: 10px; /* Расстояние между кнопками */
+}
+.actions-cell form {
+    margin: 0; /* Убираем лишние отступы у формы */
+}
+.text-muted {
+    color: #888;
+}
+
+/* ===== Search History (no bootstrap) ===== */
+.history-wrap{
+  max-width: 1050px;
+  margin: 0 auto;
+  padding: 18px 14px 28px;
+}
+
+.history-toolbar{
+  display:flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+  margin: 6px 0 14px;
+}
+
+.history-title{
+  margin: 0;
+  font-size: 22px;
+  letter-spacing: .2px;
+}
+
+.history-toolbar-actions{
+  margin: 0;
+}
+
+.history-panel{
+  background: #fff;
+  border: 1px solid rgba(0,0,0,.08);
+  border-radius: 14px;
+  box-shadow: 0 2px 10px rgba(0,0,0,.06);
+  overflow: hidden;
+}
+
+.table-scroll{ overflow-x:auto; }
+
+.history-table{
+  width: 100%;
+  border-collapse: collapse;
+  min-width: 720px;
+}
+
+.history-table thead th{
+  background: rgba(0,0,0,.03);
+  color: #404040;
+  font-size: 12px;
+  text-transform: uppercase;
+  letter-spacing: .08em;
+  padding: 12px 14px;
+  text-align: left;
+  border-bottom: 1px solid rgba(0,0,0,.08);
+}
+
+.history-table tbody td{
+  padding: 12px 14px;
+  border-bottom: 1px solid rgba(0,0,0,.06);
+  vertical-align: top;
+}
+
+.history-table tbody tr:hover{
+  background: rgba(0,0,0,.02);
+}
+
+.history-when{
+  white-space: nowrap;
+  color: #555;
+  font-size: 13px;
+}
+
+.history-chips{
+  display:flex;
+  flex-wrap: wrap;
+  gap: 8px;
+}
+
+.chip{
+  display:inline-flex;
+  align-items:center;
+  padding: 6px 10px;
+  border-radius: 999px;
+  font-size: 13px;
+  background: #f3f5f7;
+  border: 1px solid rgba(0,0,0,.07);
+  color: #222;
+}
+
+.chip--name{
+  background: #eef4ff;
+  border-color: rgba(52, 102, 255, .20);
+}
+
+.chip--ing{
+  background: #eaf8f0;
+  border-color: rgba(25, 135, 84, .22);
+  color: #146c43;
+}
+
+.history-actions-cell{ text-align: right; }
+
+.history-actions{
+  display:flex;
+  gap: 10px;
+  justify-content: flex-end;
+  align-items: center;
+}
+
+.history-actions form{ margin:0; }
+
+/* Small neutral button style that should fit your “old” design */
+.btn-lite{
+  display:inline-flex;
+  align-items:center;
+  justify-content:center;
+  padding: 8px 11px;
+  border-radius: 10px;
+  border: 1px solid rgba(0,0,0,.16);
+  background: #fff;
+  color: #1f2d3d;
+  text-decoration:none;
+  font-size: 13px;
+  cursor:pointer;
+}
+
+.btn-lite:hover{
+  background: rgba(0,0,0,.03);
+}
+
+.btn-danger-lite{
+  border-color: rgba(220,53,69,.35);
+  color: #b02a37;
+}
+
+.btn-danger-lite:hover{
+  background: rgba(220,53,69,.08);
+}
+
+.empty-card{
+  background:#fff;
+  border: 1px dashed rgba(0,0,0,.18);
+  border-radius: 14px;
+  padding: 22px;
+  text-align:center;
+  color:#666;
 }
