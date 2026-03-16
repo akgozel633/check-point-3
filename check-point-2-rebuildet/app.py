@@ -1,4 +1,5 @@
 import json
+import os
 import urllib.request
 import urllib.parse
 import sqlite3
@@ -12,7 +13,7 @@ from werkzeug.security import generate_password_hash, check_password_hash
 app = Flask(__name__)
 app.secret_key = "recipe_pro_ultra_secret_2026"
 
-DATABASE = 'recipes.db'
+DATABASE = os.environ.get('DATABASE_PATH', 'recipes.db')
 APP_BOOT_ID = str(uuid4())
 
 # ---------------- DATABASE ----------------
@@ -694,6 +695,12 @@ def save_online(meal_id):
 if __name__ == '__main__':
     with app.app_context():
         init_db()
-    app.run(debug=True)
+    
+    # Railway provides a PORT environment variable. 
+    # We default to 5000 for local development.
+    port = int(os.environ.get("PORT", 5000))
+    
+    # host='0.0.0.0' is required for Railway to route traffic to your app
+    app.run(host='0.0.0.0', port=port, debug=False)
 
 #lol
