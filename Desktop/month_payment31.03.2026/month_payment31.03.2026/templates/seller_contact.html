@@ -1,0 +1,93 @@
+{% extends "layout.html" %}
+
+{% block title %}Seller Contact Information{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-success text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-phone"></i>
+                        Seller Contact Information
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-success">
+                        <i class="fas fa-check-circle"></i>
+                        1 token has been deducted for viewing this information.
+                    </div>
+
+                    <div class="row mb-4">
+                        <div class="col-md-4">
+                            {% if product.photo_filename %}
+                                <img src="{{ url_for('static', filename='uploads/' + product.photo_filename) }}" 
+                                     class="img-fluid rounded" alt="{{ product.title }}">
+                            {% else %}
+                                <div class="bg-light rounded d-flex align-items-center justify-content-center" style="height: 200px;">
+                                    <i class="fas fa-image fa-3x text-muted"></i>
+                                </div>
+                            {% endif %}
+                        </div>
+                        <div class="col-md-8">
+                            <h4>{{ product.title }}</h4>
+                            <p class="text-muted">{{ product.description[:100] }}{% if product.description|length > 100 %}...{% endif %}</p>
+                            <h3 class="text-primary">{{ "%.2f"|format(product.price) }} TMT</h3>
+                            <span class="badge badge-{{ 'success' if product.status == 'Available' else 'secondary' }}">
+                                {{ product.status }}
+                            </span>
+                        </div>
+                    </div>
+
+                    <div class="card border-primary">
+                        <div class="card-header bg-primary text-white">
+                            <h5 class="mb-0">
+                                <i class="fas fa-store"></i>
+                                {{ seller.business_name }}
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row">
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-user"></i> Contact Person</h6>
+                                    <p class="font-weight-bold">{{ seller.username }}</p>
+                                </div>
+                                <div class="col-md-6">
+                                    <h6><i class="fas fa-phone"></i> Phone Number</h6>
+                                    <p class="font-weight-bold text-primary h4">{{ seller.phone_number }}</p>
+                                </div>
+                            </div>
+                            <div class="row">
+                                <div class="col-md-12">
+                                    <h6><i class="fas fa-envelope"></i> Email</h6>
+                                    <p class="font-weight-bold">{{ seller.email }}</p>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="alert alert-info mt-3">
+                        <h6><i class="fas fa-info-circle"></i> Tips for Contacting Seller:</h6>
+                        <ul class="mb-0">
+                            <li>Be polite and professional when contacting the seller</li>
+                            <li>Have your questions ready before calling</li>
+                            <li>Mention that you found their product on this marketplace</li>
+                            <li>Arrange for safe payment and delivery methods</li>
+                        </ul>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Product
+                        </a>
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-primary">
+                            <i class="fas fa-home"></i> Dashboard
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

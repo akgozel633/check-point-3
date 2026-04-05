@@ -1,0 +1,315 @@
+{% extends "layout.html" %}
+
+{% block title %}Admin Dashboard - EcoMaterial Hub{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row">
+        <div class="col-12">
+            <div class="card">
+                <div class="card-header bg-dark text-white">
+                    <h3 class="mb-0">
+                        <i class="fas fa-shield-alt"></i> Admin Dashboard
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info" id="ajax-message" style="display: none;"></div>
+
+                    <div class="alert alert-info">
+                        <i class="fas fa-info-circle"></i> 
+                        <strong>Admin Panel:</strong> Manage users, balances, and account status.
+                    </div>
+
+                    <!-- Users Table -->
+                    <div class="table-responsive">
+                        <table class="table table-striped table-hover" id="users-table">
+                            <thead class="table-dark">
+                                <tr>
+                                    <th>ID</th>
+                                    <th>Username</th>
+                                    <th>Email</th>
+                                    <th>Business Name</th>
+                                    <th>Status</th>
+                                    <th>Days Left</th>
+                                    <th>Actions</th>
+                                </tr>
+                            </thead>
+                            <tbody>
+                                {% for user in users %}
+                                <tr id="user-row-{{ user.id }}">
+                                    <td>{{ user.id }}</td>
+                                    <td>
+                                        <strong>{{ user.username }}</strong>
+                                        {% if user.is_admin %}
+                                        <span class="badge bg-warning ms-1">Admin</span>
+                                        {% endif %}
+                                    </td>
+                                    <td>{{ user.email }}</td>
+                                    <td>{{ user.business_name }}</td>
+                                    <td id="status-{{ user.id }}">
+                                        {% if user.is_admin %}
+                                            <span class="badge bg-warning">Admin</span>
+                                        {% elif user.get_access_status().startswith('Trial') %}
+                                            <span class="badge bg-info">Trial</span>
+                                        {% elif user.get_access_status().startswith('Active') %}
+                                            <span class="badge bg-success">Active</span>
+                                        {% else %}
+                                            <span class="badge bg-danger">Expired</span>
+                                        {% endif %}
+                                    </td>
+                                    <td id="days-{{ user.id }}">
+                                        {% if user.is_admin %}
+                                            <span class="text-muted">-</span>
+                                        {% else %}
+                                            {% set days = user.subscription_days_remaining() %}
+                                            {% if days > 0 %}
+                                                <span class="badge bg-primary">{{ days }} days</span>
+                                            {% elif user.trial_days_remaining() > 0 %}
+                                                <span class="badge bg-info">Trial {{ user.trial_days_remaining() }} days</span>
+                                            {% else %}
+                                                <span class="badge bg-danger">0 days</span>
+                                            {% endif %}
+                                        {% endif %}
+                                    </td>
+                                    <td>
+                                        <div class="btn-group btn-group-sm" role="group">
+                                            {% if not user.is_admin %}
+                                            <button type="button" 
+                                                    class="btn btn-success btn-sm ajax-extend"
+                                                    data-user-id="{{ user.id }}"
+                                                    data-days="30"
+                                                    title="Extend subscription 30 days">
+                                                <i class="fas fa-calendar-plus"></i> +30d
+                                            </button>
+                                            
+                                            <button type="button" 
+                                                    class="btn btn-{{ 'warning' if not user.is_blocked else 'success' }} btn-sm ajax-block"
+                                                    data-user-id="{{ user.id }}"
+                                                    data-blocked="{{ 'true' if user.is_blocked else 'false' }}"
+                                                    title="{{ 'Block' if not user.is_blocked else 'Unblock' }} user">
+                                                <i class="fas fa-{{ 'ban' if not user.is_blocked else 'check-circle' }}"></i>
+                                            </button>
+                                            
+                                            <button type="button" 
+                                                    class="btn btn-danger btn-sm ajax-delete"
+                                                    data-user-id="{{ user.id }}"
+                                                    data-username="{{ user.username }}"
+                                                    title="Delete user">
+                                                <i class="fas fa-trash"></i>
+                                            </button>
+                                            {% endif %}
+                                        </div>
+                                    </td>
+                                </tr>
+                                {% endfor %}
+                            </tbody>
+                        </table>
+                    </div>
+
+                    {% if users|length == 0 %}
+                    <div class="text-center py-5">
+                        <i class="fas fa-users fa-3x text-muted mb-3"></i>
+                        <h5 class="text-muted">No users found</h5>
+                        <p class="text-muted">No users have registered yet.</p>
+                    </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Delete Confirmation Modal -->
+<div class="modal fade" id="deleteModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title">Confirm Deletion</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <div class="alert alert-warning">
+                    <i class="fas fa-exclamation-triangle"></i>
+                    <strong>Warning:</strong> This action cannot be undone!
+                </div>
+                <p>You are about to delete the user:</p>
+                <ul>
+                    <li><strong>Username:</strong> <span id="delete-username"></span></li>
+                </ul>
+                <p>All associated products will also be deleted.</p>
+                <hr>
+                <p>To confirm, type the username below:</p>
+                <div class="mb-3">
+                    <input type="text" 
+                           id="delete-confirm-input"
+                           class="form-control" 
+                           placeholder="Type username to confirm"
+                           required>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-btn">
+                    <i class="fas fa-trash"></i> Delete User
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    
+    function showMessage(message, type = 'success') {
+        const msgDiv = document.getElementById('ajax-message');
+        msgDiv.className = `alert alert-${type}`;
+        msgDiv.innerHTML = `<i class="fas fa-${type === 'success' ? 'check' : 'exclamation'}-circle"></i> ${message}`;
+        msgDiv.style.display = 'block';
+        setTimeout(() => msgDiv.style.display = 'none', 3000);
+    }
+
+    // Extend Subscription AJAX
+    document.querySelectorAll('.ajax-extend').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const userId = this.dataset.userId;
+            const days = this.dataset.days;
+            
+            this.disabled = true;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            try {
+                const response = await fetch(`/admin/user/${userId}/extend`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `days=${days}&csrf_token=${csrfToken}`
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    // Update days cell
+                    const daysCell = document.getElementById(`days-${userId}`);
+                    daysCell.innerHTML = `<span class="badge bg-primary">${result.days_remaining} days</span>`;
+                    
+                    // Update status cell
+                    const statusCell = document.getElementById(`status-${userId}`);
+                    statusCell.innerHTML = '<span class="badge bg-success">Active</span>';
+                    
+                    showMessage(result.message);
+                } else {
+                    showMessage(result.error || 'Failed to extend subscription', 'danger');
+                }
+            } catch (error) {
+                showMessage('Network error', 'danger');
+            } finally {
+                this.disabled = false;
+                this.innerHTML = '<i class="fas fa-calendar-plus"></i> +30d';
+            }
+        });
+    });
+
+    // Block/Unblock AJAX
+    document.querySelectorAll('.ajax-block').forEach(btn => {
+        btn.addEventListener('click', async function() {
+            const userId = this.dataset.userId;
+            const isBlocked = this.dataset.blocked === 'true';
+            
+            this.disabled = true;
+            const originalHtml = this.innerHTML;
+            this.innerHTML = '<i class="fas fa-spinner fa-spin"></i>';
+            
+            try {
+                const response = await fetch(`/admin/user/${userId}/block`, {
+                    method: 'POST',
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Content-Type': 'application/x-www-form-urlencoded',
+                    },
+                    body: `csrf_token=${csrfToken}`
+                });
+                
+                const result = await response.json();
+                
+                if (response.ok && result.success) {
+                    // Toggle button appearance
+                    const newBlocked = !isBlocked;
+                    this.dataset.blocked = newBlocked ? 'true' : 'false';
+                    this.className = `btn btn-${newBlocked ? 'success' : 'warning'} btn-sm ajax-block`;
+                    this.title = newBlocked ? 'Unblock user' : 'Block user';
+                    this.innerHTML = `<i class="fas fa-${newBlocked ? 'check-circle' : 'ban'}"></i>`;
+                    
+                    showMessage(result.message);
+                } else {
+                    showMessage(result.error || 'Failed to block/unblock user', 'danger');
+                    this.innerHTML = originalHtml;
+                }
+            } catch (error) {
+                showMessage('Network error', 'danger');
+                this.innerHTML = originalHtml;
+            } finally {
+                this.disabled = false;
+            }
+        });
+    });
+
+    // Delete AJAX
+    let deleteUserId = null;
+    let deleteUsername = null;
+    
+    document.querySelectorAll('.ajax-delete').forEach(btn => {
+        btn.addEventListener('click', function() {
+            deleteUserId = this.dataset.userId;
+            deleteUsername = this.dataset.username;
+            document.getElementById('delete-username').textContent = deleteUsername;
+            document.getElementById('delete-confirm-input').value = '';
+            new bootstrap.Modal(document.getElementById('deleteModal')).show();
+        });
+    });
+    
+    document.getElementById('confirm-delete-btn').addEventListener('click', async function() {
+        const confirmInput = document.getElementById('delete-confirm-input').value;
+        
+        if (confirmInput !== deleteUsername) {
+            showMessage('Username does not match', 'danger');
+            return;
+        }
+        
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+        
+        try {
+            const response = await fetch(`/admin/user/${deleteUserId}/delete`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/x-www-form-urlencoded',
+                },
+                body: `confirm=${encodeURIComponent(deleteUsername)}&csrf_token=${csrfToken}`
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+                // Remove row from table
+                const row = document.getElementById(`user-row-${deleteUserId}`);
+                row.remove();
+                
+                bootstrap.Modal.getInstance(document.getElementById('deleteModal')).hide();
+                showMessage(result.message);
+            } else {
+                showMessage(result.error || 'Failed to delete user', 'danger');
+            }
+        } catch (error) {
+            showMessage('Network error', 'danger');
+        } finally {
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-trash"></i> Delete User';
+        }
+    });
+});
+</script>
+{% endblock %}

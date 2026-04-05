@@ -1,0 +1,462 @@
+{% extends "layout.html" %}
+
+{% block title %}Sell Product - EcoMaterial Hub{% endblock %}
+
+{% block content %}
+<style>
+/* Import modern fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Global Styles */
+body {
+    background-color: #f7f9fc !important;
+    line-height: 1.6 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Main Form Container */
+.sell-container {
+    max-width: 800px;
+    margin: 2rem auto;
+    padding: 2.5rem;
+    background: rgba(255, 255, 255, 0.95);
+    border-radius: 10px;
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.06);
+    position: relative;
+}
+
+/* Typography */
+.sell-title {
+    font-size: 2rem;
+    font-weight: 700;
+    color: #2c3e50;
+    margin-bottom: 0.5rem;
+    text-align: center;
+}
+
+.sell-subtitle {
+    text-align: center;
+    color: #6c757d;
+    margin-bottom: 2rem;
+    font-size: 1.1rem;
+    line-height: 1.5;
+}
+
+/* Form Styles */
+.form-label {
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.form-control, .form-select {
+    border: 2px solid #e1e4e8;
+    border-radius: 8px;
+    padding: 0.875rem 1rem;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: white;
+    line-height: 1.5;
+}
+
+.form-control:focus, .form-select:focus {
+    outline: none;
+    border-color: #2ecc71;
+    box-shadow: 0 0 0 3px rgba(46, 204, 113, 0.1);
+    background: #f8fff9;
+}
+
+.form-control:hover, .form-select:hover {
+    border-color: #d1d5db;
+}
+
+/* Price Input Container with Flexbox */
+.price-input-container {
+    display: flex;
+    align-items: center;
+    gap: 8px;
+}
+
+.price-input-container .form-control {
+    flex: 1;
+    margin: 0;
+}
+
+.currency-label {
+    color: #6c757d;
+    font-weight: 600;
+    font-size: 1rem;
+    white-space: nowrap;
+    margin: 0;
+}
+
+/* Form Groups */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+/* File Upload */
+.file-upload {
+    border: 2px dashed #d1d5db;
+    border-radius: 8px;
+    padding: 2rem;
+    text-align: center;
+    background: #f8f9fa;
+    transition: all 0.3s ease;
+    cursor: pointer;
+    position: relative;
+}
+
+.file-upload:hover {
+    border-color: #2ecc71;
+    background: #f0fff4;
+}
+
+.file-upload input[type="file"] {
+    position: absolute;
+    opacity: 0;
+    width: 100%;
+    height: 100%;
+    cursor: pointer;
+}
+
+.file-upload-label {
+    display: block;
+    font-weight: 600;
+    color: #374151;
+    margin-bottom: 0.5rem;
+    font-size: 0.95rem;
+}
+
+.upload-icon {
+    font-size: 2.5rem;
+    color: #27ae60;
+    margin-bottom: 1rem;
+}
+
+.upload-hint {
+    font-size: 0.85rem;
+    color: #6c757d;
+    font-style: italic;
+    margin-top: 0.5rem;
+}
+
+/* Buttons */
+.btn {
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    padding: 0.75rem 1.5rem;
+    transition: all 0.3s ease;
+    border: none;
+    cursor: pointer;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #27ae60, #2ecc71);
+    color: white;
+    box-shadow: 0 4px 12px rgba(39, 174, 96, 0.2);
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #229954, #27ae60);
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(39, 174, 96, 0.3);
+}
+
+.btn-secondary {
+    background: transparent;
+    color: #6c757d;
+    border: 2px solid #6c757d;
+}
+
+.btn-secondary:hover {
+    background: #6c757d;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Error Messages */
+.text-danger {
+    color: #e74c3c;
+    font-size: 0.85rem;
+    margin-top: 0.25rem;
+}
+
+/* Status Badge */
+.status-badge {
+    display: inline-block;
+    padding: 0.25rem 0.75rem;
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    background: linear-gradient(135deg, #d4edda, #a29bfe);
+    color: white;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .sell-container {
+        margin: 1rem;
+        padding: 1.5rem;
+    }
+    
+    .form-group {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+
+<div class="sell-container">
+    <h1 class="sell-title">
+        <i class="fas fa-plus-circle" style="color: #27ae60; margin-right: 0.5rem;"></i>
+        List Your Product
+    </h1>
+    <p class="sell-subtitle">Share your sustainable materials with our community</p>
+    
+    <form method="POST" enctype="multipart/form-data">
+        {{ form.hidden_tag() }}
+        
+        <div class="form-group">
+            {{ form.title.label(class="form-label") }}
+            {{ form.title(class="form-control", placeholder="Enter a descriptive title for your product") }}
+            {% if form.title.errors %}
+                <div class="text-danger">
+                    {% for error in form.title.errors %}
+                        <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            {{ form.category_id.label(class="form-label") }}
+            {{ form.category_id(class="form-select") }}
+            {% if form.category_id.errors %}
+                <div class="text-danger">
+                    {% for error in form.category_id.errors %}
+                        <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            {{ form.description.label(class="form-label") }}
+            {{ form.description(class="form-control", rows="4", placeholder="Describe your product's features, materials, and benefits...") }}
+            {% if form.description.errors %}
+                <div class="text-danger">
+                    {% for error in form.description.errors %}
+                        <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="row">
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.price.label(class="form-label") }}
+                    <div class="price-input-container">
+                        {{ form.price(class="form-control", placeholder="0.00") }}
+                        <span class="currency-label">TMT</span>
+                    </div>
+                    {% if form.price.errors %}
+                        <div class="text-danger">
+                            {% for error in form.price.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="col-md-6">
+                <div class="form-group">
+                    {{ form.quantity.label(class="form-label") }}
+                    {{ form.quantity(class="form-control", placeholder="Available quantity") }}
+                    {% if form.quantity.errors %}
+                        <div class="text-danger">
+                            {% for error in form.quantity.errors %}
+                                <small>{{ error }}</small>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <div class="form-group">
+            {{ form.status.label(class="form-label") }}
+            {{ form.status(class="form-select") }}
+            <span class="status-badge">Helps buyers know availability</span>
+            {% if form.status.errors %}
+                <div class="text-danger">
+                    {% for error in form.status.errors %}
+                        <small>{{ error }}</small>
+                    {% endfor %}
+                </div>
+            {% endif %}
+        </div>
+        
+        <div class="form-group">
+            <label for="photo" class="file-upload-label">
+                <i class="fas fa-camera upload-icon"></i>
+                Product Photo
+            </label>
+            <div class="file-upload">
+                <input type="file" id="photo" name="photo" accept="image/*">
+                <div class="upload-hint">
+                    <i class="fas fa-cloud-upload-alt"></i>
+                    Click to upload or drag and drop your image here
+                </div>
+                <small class="upload-hint" id="file-name-hint">No file chosen yet</small>
+            </div>
+        </div>
+        
+        <div class="d-flex justify-content-between gap-3 mt-4">
+            <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                <i class="fas fa-arrow-left"></i> Back to Dashboard
+            </a>
+            <button type="submit" class="btn btn-success">
+                <i class="fas fa-check-circle"></i> List Product
+            </button>
+        </div>
+    </form>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const fileInput = document.getElementById('photo');
+    const fileNameHint = document.getElementById('file-name-hint');
+    const form = document.querySelector('form');
+    const submitButton = form.querySelector('button[type="submit"]');
+    
+    // Handle file selection
+    if (fileInput) {
+        fileInput.addEventListener('change', function(e) {
+            const file = e.target.files[0];
+            if (file) {
+                fileNameHint.textContent = file.name;
+                fileNameHint.style.color = '#27ae60';
+            } else {
+                fileNameHint.textContent = 'No file chosen yet';
+                fileNameHint.style.color = '#6c757d';
+            }
+        });
+    }
+    
+    // Handle AJAX form submission
+    if (form) {
+        form.addEventListener('submit', function(e) {
+            e.preventDefault(); // Prevent normal form submission
+            
+            // Show loading state
+            const originalButtonText = submitButton.innerHTML;
+            submitButton.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Processing...';
+            submitButton.disabled = true;
+            
+            // Create FormData object
+            const formData = new FormData(form);
+            
+            // Send AJAX request
+            fetch('{{ url_for("sell") }}', {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    showSuccessAlert(data.message);
+                    
+                    // Reset form
+                    form.reset();
+                    fileNameHint.textContent = 'No file chosen yet';
+                    fileNameHint.style.color = '#6c757d';
+                    
+                    // Redirect to dashboard after 2 seconds
+                    setTimeout(() => {
+                        window.location.href = '{{ url_for("dashboard") }}';
+                    }, 2000);
+                } else {
+                    // Show error messages
+                    showFormErrors(data.errors);
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                showErrorAlert('An unexpected error occurred. Please try again.');
+            })
+            .finally(() => {
+                // Restore button state
+                submitButton.innerHTML = originalButtonText;
+                submitButton.disabled = false;
+            });
+        });
+    }
+    
+    // Show success alert
+    function showSuccessAlert(message) {
+        removeExistingAlerts();
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-success alert-dismissible fade show position-fixed';
+        alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alert.innerHTML = `
+            <i class="fas fa-check-circle"></i> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alert);
+        
+        // Auto-remove after 5 seconds
+        setTimeout(() => {
+            if (alert.parentNode) {
+                alert.remove();
+            }
+        }, 5000);
+    }
+    
+    // Show error alert
+    function showErrorAlert(message) {
+        removeExistingAlerts();
+        const alert = document.createElement('div');
+        alert.className = 'alert alert-danger alert-dismissible fade show position-fixed';
+        alert.style.cssText = 'top: 20px; right: 20px; z-index: 9999; min-width: 300px;';
+        alert.innerHTML = `
+            <i class="fas fa-exclamation-triangle"></i> ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        document.body.appendChild(alert);
+    }
+    
+    // Show form errors
+    function showFormErrors(errors) {
+        // Remove existing error messages
+        document.querySelectorAll('.text-danger').forEach(el => el.remove());
+        
+        // Show new error messages
+        for (const [field, messages] of Object.entries(errors)) {
+            const input = form.querySelector(`[name="${field}"]`);
+            if (input) {
+                const errorDiv = document.createElement('div');
+                errorDiv.className = 'text-danger';
+                errorDiv.innerHTML = messages.map(msg => `<small>${msg}</small>`).join('<br>');
+                input.parentNode.appendChild(errorDiv);
+            }
+        }
+        
+        // Show general error alert
+        showErrorAlert('Please fix the errors in the form.');
+    }
+    
+    // Remove existing alerts
+    function removeExistingAlerts() {
+        document.querySelectorAll('.alert').forEach(el => el.remove());
+    }
+});
+</script>
+{% endblock %}

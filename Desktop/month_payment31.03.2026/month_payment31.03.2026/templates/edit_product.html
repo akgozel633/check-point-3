@@ -1,0 +1,278 @@
+{% extends "layout.html" %}
+
+{% block title %}Edit Product - EcoMaterial Hub{% endblock %}
+
+{% block content %}
+<div class="edit-product-container">
+    <div class="edit-header">
+        <h1><i class="fas fa-edit"></i> Edit Product</h1>
+        <p class="text-muted">Update your product information</p>
+    </div>
+
+    <div class="edit-form-card">
+        <form method="POST" enctype="multipart/form-data" class="edit-form">
+            {{ form.hidden_tag() }}
+            
+            <!-- Current Product Preview -->
+            <div class="product-preview">
+                <h3>Current Product</h3>
+                <div class="preview-content">
+                    {% if product.photo_filename %}
+                        <img src="{{ url_for('static', filename='uploads/' + product.photo_filename) }}" 
+                             alt="{{ product.title }}" class="preview-image">
+                    {% else %}
+                        <div class="preview-image placeholder">
+                            <i class="fas fa-box fa-2x"></i>
+                        </div>
+                    {% endif %}
+                    <div class="preview-info">
+                        <h4>{{ product.title }}</h4>
+                        <p class="preview-category">{{ product.category.name }}</p>
+                        <p class="preview-price">{{ "%.2f"|format(product.price) }} TMT</p>
+                        <p class="preview-quantity">{{ product.quantity }} units available</p>
+                    </div>
+                </div>
+            </div>
+            
+            <!-- Form Fields -->
+            <div class="form-group">
+                {{ form.title.label(class="form-label") }}
+                {{ form.title(class="form-control") }}
+                {% if form.title.errors %}
+                    <div class="error-message">
+                        {% for error in form.title.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {{ form.description.label(class="form-label") }}
+                {{ form.description(class="form-control", rows="5") }}
+                {% if form.description.errors %}
+                    <div class="error-message">
+                        {% for error in form.description.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-row">
+                <div class="form-group half-width">
+                    {{ form.category_id.label(class="form-label") }}
+                    {{ form.category_id(class="form-control") }}
+                    {% if form.category_id.errors %}
+                        <div class="error-message">
+                            {% for error in form.category_id.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+                
+                <div class="form-group half-width">
+                    {{ form.price.label(class="form-label") }}
+                    {{ form.price(class="form-control", placeholder="0.00") }}
+                    {% if form.price.errors %}
+                        <div class="error-message">
+                            {% for error in form.price.errors %}
+                                <span>{{ error }}</span>
+                            {% endfor %}
+                        </div>
+                    {% endif %}
+                </div>
+            </div>
+            
+            <div class="form-group">
+                {{ form.quantity.label(class="form-label") }}
+                {{ form.quantity(class="form-control") }}
+                {% if form.quantity.errors %}
+                    <div class="error-message">
+                        {% for error in form.quantity.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {{ form.status.label(class="form-label") }}
+                {{ form.status(class="form-control") }}
+                <small class="text-muted">
+                    <i class="fas fa-info-circle"></i> 
+                    Available: Product is ready for sale<br>
+                    Reserved: Product is reserved for a buyer<br>
+                    Sold: Product has been sold
+                </small>
+                {% if form.status.errors %}
+                    <div class="error-message">
+                        {% for error in form.status.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-group">
+                {{ form.photo.label(class="form-label") }}
+                {{ form.photo(class="form-control", accept="image/*", capture="environment") }}
+                <small class="text-muted">Update product photo (optional, max 5MB). Leave empty to keep current photo.</small>
+                {% if form.photo.errors %}
+                    <div class="error-message">
+                        {% for error in form.photo.errors %}
+                            <span>{{ error }}</span>
+                        {% endfor %}
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="form-actions">
+                <button type="submit" class="btn btn-primary">Update Product</button>
+                <a href="{{ url_for('dashboard') }}" class="btn btn-outline">Cancel</a>
+                <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-secondary">View Product</a>
+            </div>
+        </form>
+    </div>
+</div>
+
+<style>
+    .edit-product-container {
+        max-width: 800px;
+        margin: 0 auto;
+        padding: 1rem;
+    }
+    
+    .edit-header {
+        text-align: center;
+        margin-bottom: 2rem;
+    }
+    
+    .edit-header h1 {
+        color: var(--forest-green);
+        font-size: 2rem;
+        margin-bottom: 0.5rem;
+    }
+    
+    .edit-form-card {
+        background: var(--white);
+        border-radius: 16px;
+        padding: 2rem;
+        box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    }
+    
+    /* Product Preview */
+    .product-preview {
+        margin-bottom: 2rem;
+        padding: 1.5rem;
+        background: var(--light-gray);
+        border-radius: 12px;
+        border-left: 4px solid var(--forest-green);
+    }
+    
+    .product-preview h3 {
+        color: var(--slate);
+        margin-bottom: 1rem;
+    }
+    
+    .preview-content {
+        display: grid;
+        grid-template-columns: auto 1fr;
+        gap: 1.5rem;
+        align-items: center;
+    }
+    
+    .preview-image {
+        width: 100px;
+        height: 100px;
+        object-fit: cover;
+        border-radius: 8px;
+        background: var(--light-mint);
+    }
+    
+    .preview-image.placeholder {
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: var(--forest-green);
+    }
+    
+    .preview-info h4 {
+        color: var(--slate);
+        margin-bottom: 0.5rem;
+    }
+    
+    .preview-category {
+        color: var(--forest-green);
+        font-weight: 500;
+        margin-bottom: 0.25rem;
+    }
+    
+    .preview-price {
+        font-size: 1.25rem;
+        color: var(--forest-green);
+        font-weight: 700;
+        margin-bottom: 0.25rem;
+    }
+    
+    .preview-quantity {
+        color: #666;
+        font-size: 0.9rem;
+        margin: 0;
+    }
+    
+    /* Form Styles */
+    .form-row {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 1rem;
+    }
+    
+    .half-width {
+        width: 100%;
+    }
+    
+    .form-actions {
+        display: flex;
+        gap: 1rem;
+        margin-top: 2rem;
+        padding-top: 2rem;
+        border-top: 1px solid var(--light-gray);
+    }
+    
+    .error-message {
+        color: #d32f2f;
+        font-size: 0.875rem;
+        margin-top: 0.25rem;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .edit-product-container {
+            padding: 0.5rem;
+        }
+        
+        .edit-form-card {
+            padding: 1.5rem;
+        }
+        
+        .preview-content {
+            grid-template-columns: 1fr;
+            text-align: center;
+        }
+        
+        .preview-image {
+            margin: 0 auto;
+        }
+        
+        .form-row {
+            grid-template-columns: 1fr;
+        }
+        
+        .form-actions {
+            flex-direction: column;
+        }
+    }
+</style>
+{% endblock %}

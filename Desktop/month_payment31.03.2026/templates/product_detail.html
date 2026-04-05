@@ -1,0 +1,746 @@
+{% extends "layout.html" %}
+
+{% block title %}{{ product.title }} - EcoMaterial Hub{% endblock %}
+
+{% block content %}
+<div class="product-detail-container">
+    <!-- Minimal Header -->
+    <div class="detail-header">
+        <a href="{{ url_for('search') }}" class="minimal-back">
+            <i class="fas fa-arrow-left"></i>
+        </a>
+    </div>
+
+    <!-- Main Product Card -->
+    <div class="product-card">
+        <!-- Top Section: Image + Info -->
+        <div class="product-main">
+            <div class="product-image-section">
+                {% if product.photo_filename %}
+                    <img src="{{ url_for('static', filename='uploads/' + product.photo_filename) }}" 
+                         alt="{{ product.title }}" class="product-image">
+                {% else %}
+                    <div class="product-image-placeholder">
+                        <i class="fas fa-box"></i>
+                    </div>
+                {% endif %}
+            </div>
+            
+            <div class="product-info-section">
+                <div class="product-category">{{ product.category.name }}</div>
+                <h1 class="product-title">{{ product.title }}</h1>
+                <div class="product-price">{{ "%.2f"|format(product.price) }} TMT</div>
+                
+                <div class="product-meta">
+                    <div class="meta-item">
+                        <span class="meta-label">Quantity</span>
+                        <span class="meta-value">{{ product.quantity }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="meta-label">Views</span>
+                        <span class="meta-value">{{ product.views }}</span>
+                    </div>
+                    <div class="meta-item">
+                        <span class="status-badge status-{{ product.status|lower }}">{{ product.status }}</span>
+                    </div>
+                </div>
+                
+                <div class="seller-section">
+                    <div class="seller-name">{{ product.seller.business_name }}</div>
+                    
+                    <div class="action-buttons">
+                        {% if current_user.is_authenticated %}
+                            <a href="{{ url_for('view_seller_number', product_id=product.id) }}" class="btn-ghost btn-phone">
+                                <i class="fas fa-phone"></i> View Seller Number
+                            </a>
+                            
+                            <button class="heart-icon-only favorite-btn" data-product-id="{{ product.id }}" aria-label="Save to favorites">
+                                {% if is_favorited %}
+                                    <i class="fas fa-heart"></i>
+                                {% else %}
+                                    <i class="far fa-heart"></i>
+                                {% endif %}
+                            </button>
+                        {% else %}
+                            <a href="{{ url_for('login') }}" class="btn-ghost">Login to contact seller</a>
+                        {% endif %}
+                    </div>
+                    
+                    {% if current_user.is_authenticated %}
+                        {% if current_user.is_admin %}
+                            <p class="access-note">Admin access</p>
+                            {% if seller_subscription %}
+                                <div class="seller-subscription-info">
+                                    {% if seller_subscription.is_active %}
+                                        <span class="sub-badge sub-active">
+                                            <i class="fas fa-check-circle"></i> Active ({{ seller_subscription.days_remaining }} days left)
+                                        </span>
+                                    {% elif seller_subscription.trial_days > 0 %}
+                                        <span class="sub-badge sub-trial">
+                                            <i class="fas fa-gift"></i> Trial ({{ seller_subscription.trial_days }} days left)
+                                        </span>
+                                    {% else %}
+                                        <span class="sub-badge sub-expired">
+                                            <i class="fas fa-exclamation-circle"></i> Expired
+                                        </span>
+                                    {% endif %}
+                                </div>
+                            {% endif %}
+                        {% elif current_user.is_trial_active() %}
+                            <p class="access-note">Free during trial</p>
+                        {% endif %}
+                    {% endif %}
+                </div>
+            </div>
+        </div>
+        
+        <!-- Divider -->
+        <div class="section-divider"></div>
+        
+        <!-- Description Section -->
+        <div class="description-section">
+            <h2 class="section-title">Description</h2>
+            <p class="description-text">{{ product.description or 'No description available.' }}</p>
+        </div>
+        
+        <!-- Divider -->
+        <div class="section-divider"></div>
+        
+        <!-- Reviews Section -->
+        <div class="reviews-section">
+            <div class="reviews-header">
+                <h2 class="section-title">Reviews</h2>
+                {% if product.reviews %}
+                    <div class="rating-summary">
+                        <span class="rating-number">{{ "%.1f"|format(product.reviews|map(attribute='rating')|sum / product.reviews|length) }}</span>
+                        <div class="rating-stars">
+                            {% for i in range(5) %}
+                                {% if i < (product.reviews|map(attribute='rating')|sum / product.reviews|length) %}
+                                    <i class="fas fa-star"></i>
+                                {% else %}
+                                    <i class="far fa-star"></i>
+                                {% endif %}
+                            {% endfor %}
+                        </div>
+                        <span class="rating-count">({{ product.reviews|length }})</span>
+                    </div>
+                {% endif %}
+            </div>
+            
+            {% if product.reviews %}
+                <div class="reviews-list">
+                    {% for review in product.reviews %}
+                        <div class="review-item">
+                            <div class="review-header">
+                                <span class="reviewer-name">{{ review.reviewer.business_name }}</span>
+                                <span class="review-date">{{ review.created_at.strftime('%b %d, %Y') }}</span>
+                            </div>
+                            <div class="review-stars">
+                                {% for i in range(1, 6) %}
+                                    {% if i <= review.rating %}
+                                        <i class="fas fa-star"></i>
+                                    {% else %}
+                                        <i class="far fa-star"></i>
+                                    {% endif %}
+                                {% endfor %}
+                            </div>
+                            {% if review.comment %}
+                                <p class="review-text">{{ review.comment }}</p>
+                            {% endif %}
+                        </div>
+                    {% endfor %}
+                </div>
+            {% else %}
+                <p class="no-reviews">No reviews yet. Be the first to review this product!</p>
+            {% endif %}
+            
+            <!-- Review Form -->
+            {% if current_user.is_authenticated and not has_reviewed %}
+                <div class="review-form-section">
+                    <h3 class="form-title">Leave a Review</h3>
+                    <form method="POST" action="{{ url_for('add_review', product_id=product.id) }}">
+                        {{ form.hidden_tag() }}
+                        
+                        <div class="rating-input">
+                            <label class="input-label">Rating</label>
+                            <div class="star-rating">
+                                {% for i in range(5, 0, -1) %}
+                                    <input type="radio" class="star-input" name="rating" id="star{{ i }}" value="{{ i }}" required>
+                                    <label class="star-label" for="star{{ i }}">
+                                        <i class="fas fa-star"></i>
+                                    </label>
+                                {% endfor %}
+                            </div>
+                        </div>
+                        
+                        <div class="comment-input">
+                            <label for="comment" class="input-label">Comment (optional)</label>
+                            <textarea class="comment-textarea" id="comment" name="comment" rows="3" maxlength="500" placeholder="Share your experience with this product..."></textarea>
+                        </div>
+                        
+                        <button type="submit" class="btn-submit">
+                            Submit Review
+                        </button>
+                    </form>
+                </div>
+            {% elif current_user.is_authenticated and has_reviewed %}
+                <p class="already-reviewed">You have already reviewed this product.</p>
+            {% else %}
+                <p class="login-to-review"><a href="{{ url_for('login') }}">Login</a> to leave a review.</p>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<style>
+    /* Container */
+    .product-detail-container {
+        max-width: 1000px;
+        margin: 0 auto;
+        padding: 20px;
+    }
+    
+    /* Minimal Header */
+    .detail-header {
+        display: flex;
+        justify-content: flex-start;
+        align-items: center;
+        margin-bottom: 24px;
+        padding: 0 8px;
+    }
+    
+    .minimal-back {
+        width: 40px;
+        height: 40px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #6b7280;
+        text-decoration: none;
+        border-radius: 50%;
+        transition: all 0.2s ease;
+    }
+    
+    .minimal-back:hover {
+        background: #f3f4f6;
+        color: #374151;
+    }
+    
+    .minimal-close {
+        width: 40px;
+        height: 40px;
+        border: none;
+        background: transparent;
+        color: #6b7280;
+        font-size: 28px;
+        font-weight: 300;
+        cursor: pointer;
+        border-radius: 50%;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        transition: all 0.2s ease;
+        line-height: 1;
+    }
+    
+    .minimal-close:hover {
+        background: #f3f4f6;
+        color: #374151;
+    }
+    
+    /* Main Card */
+    .product-card {
+        background: #ffffff;
+        border-radius: 24px;
+        box-shadow: 0 4px 24px rgba(0, 0, 0, 0.04), 0 1px 2px rgba(0, 0, 0, 0.02);
+        padding: 48px;
+    }
+    
+    /* Top Section */
+    .product-main {
+        display: grid;
+        grid-template-columns: 1fr 1fr;
+        gap: 48px;
+        align-items: start;
+    }
+    
+    /* Image */
+    .product-image-section {
+        border-radius: 16px;
+        overflow: hidden;
+        background: #f9fafb;
+    }
+    
+    .product-image {
+        width: 100%;
+        height: 400px;
+        object-fit: cover;
+        display: block;
+    }
+    
+    .product-image-placeholder {
+        width: 100%;
+        height: 400px;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        color: #9ca3af;
+        font-size: 64px;
+    }
+    
+    /* Info Section */
+    .product-info-section {
+        display: flex;
+        flex-direction: column;
+        gap: 20px;
+    }
+    
+    .product-category {
+        display: inline-block;
+        padding: 6px 14px;
+        background: #dcfce7;
+        color: #166534;
+        font-size: 12px;
+        font-weight: 600;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        border-radius: 20px;
+        width: fit-content;
+    }
+    
+    .product-title {
+        font-size: 36px;
+        font-weight: 800;
+        color: #1f2937;
+        line-height: 1.2;
+        margin: 0;
+        font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+        letter-spacing: -0.02em;
+    }
+    
+    .product-price {
+        font-size: 32px;
+        font-weight: 800;
+        color: #059669;
+        margin-top: 8px;
+        letter-spacing: -0.01em;
+    }
+    
+    /* Meta Data */
+    .product-meta {
+        display: flex;
+        gap: 32px;
+        margin-top: 8px;
+        padding-top: 24px;
+        padding-bottom: 24px;
+        border-top: 1px solid #f3f4f6;
+        border-bottom: 1px solid #e5e7eb;
+    }
+    
+    .meta-item {
+        display: flex;
+        flex-direction: column;
+        gap: 4px;
+    }
+    
+    .meta-label {
+        font-size: 11px;
+        color: #9ca3af;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+    }
+    
+    .meta-value {
+        font-size: 16px;
+        font-weight: 600;
+        color: #374151;
+    }
+    
+    .status-badge {
+        padding: 4px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 600;
+    }
+    
+    .status-available {
+        background: #dcfce7;
+        color: #166534;
+    }
+    
+    .status-reserved {
+        background: #fef3c7;
+        color: #92400e;
+    }
+    
+    .status-sold {
+        background: #f3f4f6;
+        color: #6b7280;
+    }
+    
+    /* Seller Section */
+    .seller-section {
+        margin-top: auto;
+        padding-top: 24px;
+    }
+    
+    .seller-name {
+        font-size: 16px;
+        font-weight: 600;
+        color: #374151;
+        margin-bottom: 16px;
+    }
+    
+    .action-buttons {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+    
+    /* Ghost Button */
+    .btn-ghost {
+        display: inline-flex;
+        align-items: center;
+        gap: 8px;
+        padding: 12px 24px;
+        border: 1px solid #d1d5db;
+        background: transparent;
+        color: #374151;
+        font-size: 14px;
+        font-weight: 500;
+        text-decoration: none;
+        border-radius: 10px;
+        transition: all 0.2s ease;
+        cursor: pointer;
+    }
+    
+    .btn-ghost:hover {
+        border-color: #059669;
+        color: #059669;
+        background: #f0fdf4;
+    }
+    
+    .btn-phone {
+        border-color: #86efac;
+        color: #059669;
+    }
+    
+    .btn-phone:hover {
+        border-color: #22c55e;
+        background: #f0fdf4;
+    }
+    
+    /* Heart Icon Only */
+    .heart-icon-only {
+        width: 44px;
+        height: 44px;
+        border: none;
+        background: transparent;
+        cursor: pointer;
+        display: flex;
+        align-items: center;
+        justify-content: center;
+        font-size: 22px;
+        color: #dc2626;
+        transition: all 0.2s ease;
+        padding: 0;
+        line-height: 1;
+    }
+    
+    .heart-icon-only:hover {
+        transform: scale(1.1);
+    }
+    
+    .heart-icon-only .fa-heart {
+        color: #dc2626;
+        filter: drop-shadow(0 1px 2px rgba(220, 38, 38, 0.2));
+    }
+    
+    .heart-icon-only .far.fa-heart {
+        color: #d1d5db;
+    }
+    
+    .heart-icon-only:hover .far.fa-heart {
+        color: #ef4444;
+    }
+    
+    .access-note {
+        font-size: 12px;
+        color: #9ca3af;
+        margin-top: 12px;
+    }
+    
+    /* Seller Subscription Info */
+    .seller-subscription-info {
+        margin-top: 12px;
+    }
+    
+    .sub-badge {
+        display: inline-flex;
+        align-items: center;
+        gap: 6px;
+        padding: 6px 12px;
+        border-radius: 20px;
+        font-size: 12px;
+        font-weight: 500;
+    }
+    
+    .sub-active {
+        background: #dcfce7;
+        color: #166534;
+    }
+    
+    .sub-trial {
+        background: #e0f2fe;
+        color: #075985;
+    }
+    
+    .sub-expired {
+        background: #fee2e2;
+        color: #991b1b;
+    }
+    
+    /* Section Divider */
+    .section-divider {
+        height: 1px;
+        background: #f3f4f6;
+        margin: 48px 0;
+    }
+    
+    /* Section Titles */
+    .section-title {
+        font-size: 18px;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0 0 24px 0;
+    }
+    
+    /* Description */
+    .description-section {
+        max-width: 700px;
+    }
+    
+    .description-text {
+        font-size: 16px;
+        line-height: 1.7;
+        color: #4b5563;
+        margin: 0;
+    }
+    
+    /* Reviews */
+    .reviews-header {
+        display: flex;
+        justify-content: space-between;
+        align-items: center;
+        margin-bottom: 24px;
+    }
+    
+    .rating-summary {
+        display: flex;
+        align-items: center;
+        gap: 12px;
+    }
+    
+    .rating-number {
+        font-size: 24px;
+        font-weight: 700;
+        color: #1f2937;
+    }
+    
+    .rating-stars {
+        color: #fbbf24;
+        font-size: 14px;
+    }
+    
+    .rating-count {
+        font-size: 14px;
+        color: #9ca3af;
+    }
+    
+    .reviews-list {
+        display: flex;
+        flex-direction: column;
+        gap: 0;
+    }
+    
+    .review-item {
+        padding: 24px 0;
+        border-bottom: 1px solid #f3f4f6;
+    }
+    
+    .review-item:last-child {
+        border-bottom: none;
+    }
+    
+    .review-header {
+        display: flex;
+        justify-content: space-between;
+        margin-bottom: 8px;
+    }
+    
+    .reviewer-name {
+        font-weight: 600;
+        color: #374151;
+        font-size: 14px;
+    }
+    
+    .review-date {
+        font-size: 12px;
+        color: #9ca3af;
+    }
+    
+    .review-stars {
+        color: #fbbf24;
+        font-size: 12px;
+        margin-bottom: 8px;
+    }
+    
+    .review-text {
+        font-size: 14px;
+        line-height: 1.6;
+        color: #4b5563;
+        margin: 0;
+    }
+    
+    .no-reviews,
+    .already-reviewed,
+    .login-to-review {
+        font-size: 14px;
+        color: #6b7280;
+        font-style: italic;
+    }
+    
+    .login-to-review a {
+        color: #059669;
+        text-decoration: none;
+    }
+    
+    /* Review Form */
+    .review-form-section {
+        margin-top: 32px;
+        padding-top: 32px;
+        border-top: 1px solid #f3f4f6;
+    }
+    
+    .form-title {
+        font-size: 16px;
+        font-weight: 600;
+        color: #1f2937;
+        margin: 0 0 24px 0;
+    }
+    
+    .input-label {
+        display: block;
+        font-size: 12px;
+        font-weight: 500;
+        color: #6b7280;
+        text-transform: uppercase;
+        letter-spacing: 0.5px;
+        margin-bottom: 12px;
+    }
+    
+    .rating-input {
+        margin-bottom: 24px;
+    }
+    
+    .star-rating {
+        display: flex;
+        flex-direction: row-reverse;
+        justify-content: flex-end;
+        gap: 8px;
+    }
+    
+    .star-input {
+        display: none;
+    }
+    
+    .star-label {
+        font-size: 28px;
+        color: #e5e7eb;
+        cursor: pointer;
+        transition: all 0.15s ease;
+    }
+    
+    .star-label:hover,
+    .star-label:hover ~ .star-label,
+    .star-input:checked ~ .star-label {
+        color: #fbbf24;
+    }
+    
+    .comment-input {
+        margin-bottom: 24px;
+    }
+    
+    .comment-textarea {
+        width: 100%;
+        padding: 16px;
+        border: 1px solid #e5e7eb;
+        border-radius: 12px;
+        font-size: 14px;
+        line-height: 1.5;
+        color: #374151;
+        background: #f9fafb;
+        resize: vertical;
+        transition: all 0.2s ease;
+    }
+    
+    .comment-textarea:focus {
+        outline: none;
+        border-color: #86efac;
+        background: #ffffff;
+    }
+    
+    .comment-textarea::placeholder {
+        color: #9ca3af;
+    }
+    
+    .btn-submit {
+        padding: 14px 32px;
+        background: #1f2937;
+        color: #ffffff;
+        border: none;
+        border-radius: 10px;
+        font-size: 14px;
+        font-weight: 500;
+        cursor: pointer;
+        transition: all 0.2s ease;
+    }
+    
+    .btn-submit:hover {
+        background: #374151;
+    }
+    
+    /* Responsive */
+    @media (max-width: 768px) {
+        .product-card {
+            padding: 24px;
+        }
+        
+        .product-main {
+            grid-template-columns: 1fr;
+            gap: 32px;
+        }
+        
+        .product-image,
+        .product-image-placeholder {
+            height: 280px;
+        }
+        
+        .product-title {
+            font-size: 24px;
+        }
+        
+        .product-price {
+            font-size: 22px;
+        }
+        
+        .product-meta {
+            gap: 24px;
+        }
+    }
+</style>
+
+<script>
+// Close button removed - back button only
+</script>
+{% endblock %}

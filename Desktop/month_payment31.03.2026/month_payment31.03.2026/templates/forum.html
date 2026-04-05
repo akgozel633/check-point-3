@@ -1,0 +1,142 @@
+{% extends "layout.html" %}
+{% block title %}Forum{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+  <h2 class="text-success">🌱 Eco Forum</h2>
+  <p class="lead">Discuss ecological issues, share ideas and solutions.</p>
+
+  <!-- Form to create a new post -->
+  <form method="POST" enctype="multipart/form-data" class="mb-4">
+    {{ post_form.hidden_tag() }}
+    <div class="mb-3">
+      {{ post_form.content(class="form-control", rows="3", placeholder="Write your message here...") }}
+    </div>
+    <div class="mb-3">
+      {{ post_form.photo(class="form-control") }}
+    </div>
+    {{ post_form.submit(class="btn btn-success") }}
+  </form>
+
+  <!-- List of posts -->
+  {% if posts %}
+    <ul class="list-group">
+      {% for post in posts %}
+        <li class="list-group-item">
+
+          <!-- Автор с фото и меню -->
+          <div class="d-flex justify-content-between align-items-center mb-2">
+            <div class="d-flex align-items-center">
+              {% if post.user.profile_photo %}
+                <img src="{{ url_for('static', filename='uploads/' ~ post.user.profile_photo) }}"
+                     alt="{{ post.user.username }}"
+                     class="rounded-circle me-2"
+                     style="width:32px; height:32px; object-fit:cover;">
+              {% else %}
+                <i class="fas fa-user-circle fa-2x text-muted me-2"></i>
+              {% endif %}
+              <strong>{{ post.user.username }}</strong>
+            </div>
+
+            {% if post.user.id == current_user.id %}
+              <div class="dropdown">
+                <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                  ⋮
+                </button>
+                <ul class="dropdown-menu dropdown-menu-end">
+                  <li>
+                    <form method="POST" action="{{ url_for('delete_post', post_id=post.id) }}">
+                      {{ post_form.hidden_tag() }}
+                      <button type="submit" class="dropdown-item text-danger">Delete Post</button>
+                    </form>
+                  </li>
+                  <li>
+                    <a class="dropdown-item" href="{{ url_for('edit_post', post_id=post.id) }}">Edit Post</a>
+                  </li>
+                </ul>
+              </div>
+            {% endif %}
+          </div>
+
+          <p>{{ post.content }}</p>
+
+          <!-- Show photo if attached -->
+          {% if post.photo_filename %}
+            <div class="mt-2">
+              <img src="{{ url_for('static', filename='uploads/' ~ post.photo_filename) }}" 
+                   class="img-fluid" style="max-width:200px;">
+            </div>
+          {% endif %}
+
+          <!-- Replies -->
+          {% if post.replies %}
+            <ul class="mt-2">
+              {% for reply in post.replies %}
+                <li>
+                  <!-- Автор ответа с фото и меню -->
+                  <div class="d-flex justify-content-between align-items-center mb-2">
+                    <div class="d-flex align-items-center">
+                      {% if reply.user.profile_photo %}
+                        <img src="{{ url_for('static', filename='uploads/' ~ reply.user.profile_photo) }}"
+                             alt="{{ reply.user.username }}"
+                             class="rounded-circle me-2"
+                             style="width:28px; height:28px; object-fit:cover;">
+                      {% else %}
+                        <i class="fas fa-user-circle fa-lg text-muted me-2"></i>
+                      {% endif %}
+                      <em>{{ reply.user.username }}</em>
+                    </div>
+
+                    {% if reply.user.id == current_user.id %}
+                      <div class="dropdown">
+                        <button class="btn btn-sm btn-light" type="button" data-bs-toggle="dropdown" aria-expanded="false">
+                          ⋮
+                        </button>
+                        <ul class="dropdown-menu dropdown-menu-end">
+                          <li>
+                            <form method="POST" action="{{ url_for('delete_reply', reply_id=reply.id) }}">
+                              {{ reply_form.hidden_tag() }}
+                              <button type="submit" class="dropdown-item text-danger">Delete Reply</button>
+                            </form>
+                          </li>
+                          <li>
+                            <a class="dropdown-item" href="{{ url_for('edit_reply', reply_id=reply.id) }}">Edit Reply</a>
+                          </li>
+                        </ul>
+                      </div>
+                    {% endif %}
+                  </div>
+
+                  <p>{{ reply.content }}</p>
+
+                  <!-- Show reply photo if attached -->
+                  {% if reply.photo_filename %}
+                    <div class="mt-2">
+                      <img src="{{ url_for('static', filename='uploads/' ~ reply.photo_filename) }}" 
+                           class="img-fluid" style="max-width:200px;">
+                    </div>
+                  {% endif %}
+                </li>
+              {% endfor %}
+            </ul>
+          {% endif %}
+
+          <!-- Reply form -->
+          <form method="POST" action="{{ url_for('reply', post_id=post.id) }}" enctype="multipart/form-data" class="mt-2">
+            {{ reply_form.hidden_tag() }}
+            <div class="mb-2">
+              {{ reply_form.content(class="form-control", rows="2", placeholder="Write a reply...") }}
+            </div>
+            <div class="mb-2">
+              {{ reply_form.photo(class="form-control") }}
+            </div>
+            {{ reply_form.submit(class="btn btn-outline-success btn-sm") }}
+          </form>
+        </li>
+      {% endfor %}
+    </ul>
+  {% else %}
+    <div class="alert alert-info">No posts yet — be the first to start a discussion!</div>
+  {% endif %}
+</div>
+{% endblock %}

@@ -1,0 +1,379 @@
+{% extends "layout.html" %}
+
+{% block title %}Search Products - EcoMaterial Hub{% endblock %}
+
+{% block content %}
+<div class="search-page">
+    <div class="card mb-4">
+        <div class="card-body">
+            <h2 class="card-title text-success mb-4">
+                <i class="fas fa-search"></i> Search Products
+            </h2>
+            
+            <form method="POST" class="mb-4">
+                {{ form.hidden_tag() }}
+                <div class="row g-3">
+                    <div class="col-md-6">
+                        {{ form.query.label(class="form-label") }}
+                        {{ form.query(class="form-control", placeholder="Search for materials...") }}
+                    </div>
+                    <div class="col-md-4">
+                        {{ form.category.label(class="form-label") }}
+                        {{ form.category(class="form-select") }}
+                    </div>
+                    <div class="col-md-2 d-flex align-items-end">
+                        <button type="submit" class="btn btn-success w-100">
+                            <i class="fas fa-search"></i> Search
+                        </button>
+                    </div>
+                </div>
+            </form>
+        </div>
+    </div>
+
+    {% if products %}
+        <div class="search-count text-center mb-4">
+            <div class="result-badge">
+                <i class="fas fa-search"></i>
+                <span class="result-text">Found {{ products|length }} product{% if products|length != 1 %}s{% endif %}</span>
+            </div>
+        </div>
+        
+        <div class="product-grid">
+            {% for product in products %}
+                <div class="product-card">
+                    <div class="product-image">
+                        {% if product.photo_filename %}
+                            <img src="{{ url_for('static', filename='uploads/' + product.photo_filename) }}" alt="{{ product.title }}">
+                        {% else %}
+                            <i class="fas fa-box fa-3x" style="color: #dee2e6;"></i>
+                        {% endif %}
+                        <span class="product-badge">{{ product.category.name }}</span>
+                    </div>
+                    <div class="product-content">
+                        <h3 class="product-title">{{ product.title }}</h3>
+                        <p class="product-description">{{ product.description[:100] }}{% if product.description|length > 100 %}...{% endif %}</p>
+                        <div class="product-meta">
+                            <span class="product-price">{{ "%.2f"|format(product.price) }} TMT</span>
+                            <span class="product-quantity">{{ product.quantity }} available</span>
+                        </div>
+                        <div class="product-views">
+                            <span class="views-badge">
+                                <i class="fas fa-eye"></i> {{ product.views }} views
+                            </span>
+                        </div>
+                        <div class="product-actions">
+                            <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn-product btn-product-primary">
+                                <i class="fas fa-eye"></i> View Details
+                            </a>
+                            {% if current_user.is_authenticated %}
+                                {% set is_favorited = current_user.id in product.favorites|map(attribute='user_id')|list %}
+                                <button class="btn-product btn-product-outline favorite-btn" data-product-id="{{ product.id }}">
+                                {% if is_favorited %}
+                                    <i class="fas fa-heart text-danger"></i>
+                                {% else %}
+                                    <i class="far fa-heart"></i>
+                                {% endif %}
+                            </button>
+                            {% endif %}
+                        </div>
+                    </div>
+                </div>
+            {% endfor %}
+        </div>
+    {% elif request.method == 'POST' %}
+        <div class="card text-center">
+            <div class="card-body py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h3>No products found</h3>
+                <p class="text-muted">Try adjusting your search criteria</p>
+                <a href="{{ url_for('search') }}" class="btn btn-success">
+                    <i class="fas fa-arrow-left"></i> Back to Search
+                </a>
+            </div>
+        </div>
+    {% else %}
+        <div class="card text-center">
+            <div class="card-body py-5">
+                <i class="fas fa-search fa-3x text-muted mb-3"></i>
+                <h3>Start Your Search</h3>
+                <p class="text-muted">Use the search form above to find products</p>
+            </div>
+        </div>
+    {% endif %}
+</div>
+
+<style>
+/* Product card styles matching home page */
+.search-page .product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 350px));
+    gap: 1.5rem;
+    margin-top: 3rem;
+    justify-content: center;
+    width: 100%;
+}
+
+.search-page .product-card {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+    border: 1px solid #e9ecef;
+    transform: scale(1);
+    position: relative;
+    margin-bottom: 1rem;
+    max-width: 350px;
+    width: 100%;
+    justify-self: center;
+}
+
+/* Stylish Result Badge */
+.result-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.75rem;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    color: #2c3e50;
+    padding: 0.75rem 1.5rem;
+    border-radius: 25px;
+    font-size: 1rem;
+    font-weight: 600;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.08);
+    border: 2px solid #dee2e6;
+    transition: all 0.3s ease;
+    animation: slideDown 0.5s ease-out;
+}
+
+.result-badge:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 16px rgba(0, 0, 0, 0.12);
+    background: linear-gradient(135deg, #ffffff, #f8f9fa);
+}
+
+.result-badge i {
+    color: #27ae60;
+    font-size: 1.1rem;
+}
+
+.result-text {
+    color: #2c3e50;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', sans-serif;
+}
+
+@keyframes slideDown {
+    from {
+        opacity: 0;
+        transform: translateY(-20px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+.product-card::before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    right: 0;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(26, 95, 63, 0.02), rgba(45, 134, 89, 0.05));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 1;
+}
+
+.product-card:hover {
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 20px 40px rgba(26, 95, 63, 0.35);
+    border-color: #1a5f3f;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+}
+
+.product-card:hover::before {
+    opacity: 1;
+}
+
+.product-card > * {
+    position: relative;
+    z-index: 2;
+}
+
+.product-image {
+    height: 140px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    margin: 6px;
+    border-radius: 6px;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.12);
+}
+
+.product-badge {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: #1a5f3f;
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    z-index: 3;
+    margin: 6px;
+}
+
+.product-card:hover .product-badge {
+    background: linear-gradient(135deg, #2d8659, #1a5f3f);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(26, 95, 63, 0.4);
+}
+
+.product-content {
+    padding: 0.8rem;
+    padding-top: 0.3rem;
+}
+
+.product-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a5f3f;
+    margin-bottom: 0.4rem;
+    line-height: 1.3;
+}
+
+.product-description {
+    color: #6c757d;
+    margin-bottom: 0.8rem;
+    line-height: 1.4;
+    font-size: 0.85rem;
+}
+
+.product-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+}
+
+.product-price {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a5f3f;
+    letter-spacing: 0.5px;
+    white-space: nowrap;
+}
+
+.product-quantity {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+.product-views {
+    margin-bottom: 0.6rem;
+}
+
+.views-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    color: #6c757d;
+    padding: 0.3rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.views-badge:hover {
+    background: linear-gradient(135deg, #1a5f3f, #2d8659);
+    color: white;
+    transform: scale(1.05);
+}
+
+.views-badge i {
+    font-size: 0.7rem;
+}
+
+.product-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.btn-product {
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.btn-product-primary {
+    background: #1a5f3f;
+    color: white;
+}
+
+.btn-product-primary:hover {
+    background: #2d8659;
+}
+
+.btn-product-outline {
+    background: transparent;
+    color: #1a5f3f;
+    border: 1px solid #1a5f3f;
+}
+
+.btn-product-outline:hover {
+    background: #1a5f3f;
+    color: white;
+}
+
+.favorite-btn:hover {
+    transform: scale(1.05);
+}
+
+@media (max-width: 480px) {
+    .product-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+        padding: 0 0.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .product-grid {
+        grid-template-columns: repeat(2, 1fr);
+    }
+}
+</style>
+
+<script>
+// Favorite functionality is handled by main.js event delegation
+// No duplicate event listeners needed here
+</script>
+{% endblock %}

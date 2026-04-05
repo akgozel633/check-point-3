@@ -1,0 +1,1012 @@
+{% extends "layout.html" %}
+
+{% block title %}EcoChain - Home{% endblock %}
+
+{% block content %}
+<style>
+/* Pinterest-inspired design styles */
+.hero-section {
+    background: transparent;
+    color: white;
+    padding: 80px 0;
+    position: relative;
+    z-index: 2;
+}
+
+.full-video-background {
+    position: fixed;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    z-index: 0;
+}
+
+.full-video-background video {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    min-width: 100%;
+    min-height: 100%;
+    width: auto;
+    height: auto;
+    transform: translateX(-50%) translateY(-50%);
+    object-fit: cover;
+}
+
+.full-video-background .video-overlay {
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(135deg, rgba(26, 95, 63, 0.7), rgba(45, 134, 89, 0.7));
+    z-index: 1;
+}
+
+.hero-section::before {
+    display: none;
+}
+
+.hero-content {
+    position: relative;
+    z-index: 3;
+}
+
+/* Ensure navbar appears above video background */
+.navbar {
+    z-index: 1000 !important;
+    position: relative;
+    background: transparent !important;
+    box-shadow: none !important;
+    border-bottom: none !important;
+}
+
+.navbar-brand {
+    color: white !important;
+    font-weight: bold;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    background: rgba(255,255,255,0.1);
+    padding: 10px 16px 10px 15px;
+    border-radius: 8px;
+    border: 2px solid white;
+    backdrop-filter: blur(10px);
+    margin-right: 12px;
+    margin-bottom: 10px;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.navbar-brand:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-1px);
+    transition: all 0.3s ease;
+}
+
+.nav-link {
+    color: white !important;
+    text-shadow: 0 2px 4px rgba(0,0,0,0.8);
+    background: transparent;
+    border: 2px solid white;
+    border-radius: 25px;
+    padding: 10px 16px 10px 15px;
+    margin: 0 4px 8px 10px;
+    backdrop-filter: blur(10px);
+    transition: all 0.3s ease;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+}
+
+.nav-link:hover {
+    background: rgba(255,255,255,0.2);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(255,255,255,0.3);
+    color: white !important;
+}
+
+.navbar-toggler {
+    border: 2px solid white;
+    background: transparent;
+}
+
+.navbar-toggler-icon {
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 30 30'%3e%3cpath stroke='white' stroke-linecap='round' stroke-miterlimit='10' stroke-width='2' d='M4 7h22M4 15h22M4 23h22'/%3e%3c/svg%3e");
+}
+
+.hero-title {
+    font-size: 3.5rem;
+    font-weight: 700;
+    margin-bottom: 1rem;
+    line-height: 1.2;
+}
+
+.hero-subtitle {
+    font-size: 1.25rem;
+    margin-bottom: 2rem;
+    opacity: 0.9;
+}
+
+.hero-buttons {
+    display: flex;
+    gap: 1rem;
+    flex-wrap: wrap;
+}
+
+.btn-hero {
+    padding: 12px 30px;
+    font-weight: 600;
+    border-radius: 8px;
+    text-decoration: none;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.btn-hero-primary {
+    background: white;
+    color: #1a5f3f;
+}
+
+.btn-hero-primary:hover {
+    background: #f8f9fa;
+    transform: translateY(-2px);
+    box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+}
+
+.btn-hero-secondary {
+    background: transparent;
+    color: white;
+    border: 2px solid white;
+}
+
+.btn-hero-secondary:hover {
+    background: white;
+    color: #1a5f3f;
+}
+
+.about-section {
+    padding: 80px 0;
+    background: #f8f9fa;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: #1a5f3f;
+    margin-bottom: 1rem;
+}
+
+.section-subtitle {
+    font-size: 1.125rem;
+    color: #6c757d;
+    margin-bottom: 3rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 3rem;
+}
+
+.feature-card {
+    background: white;
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.feature-card:hover {
+    transform: translateY(-5px);
+    box-shadow: 0 15px 30px rgba(0,0,0,0.15);
+}
+
+.feature-icon {
+    width: 60px;
+    height: 60px;
+    background: linear-gradient(135deg, #1a5f3f, #2d8659);
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    margin: 0 auto 1.5rem;
+    color: white;
+    font-size: 1.5rem;
+}
+
+.feature-title {
+    font-size: 1.25rem;
+    font-weight: 600;
+    color: #1a5f3f;
+    margin-bottom: 1rem;
+}
+
+.feature-description {
+    color: #6c757d;
+    line-height: 1.6;
+}
+
+.products-section {
+    padding: 80px 0;
+}
+
+.product-grid {
+display: grid;
+grid-template-columns: repeat(auto-fit, minmax(280px, 350px));
+gap: 1.5rem;
+margin-top: 3rem;
+justify-content: center;
+}
+
+.product-card {
+background: white;
+border-radius: 12px;
+overflow: hidden;
+box-shadow: 0 5px 15px rgba(0,0,0,0.08);
+transition: all 0.4s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+border: 1px solid #e9ecef;
+transform: scale(1);
+position: relative;
+margin-bottom: 1rem;
+max-width: 350px;
+width: 100%;
+justify-self: center;
+}
+
+.product-card::before {
+content: '';
+position: absolute;
+top: 0;
+left: 0;
+right: 0;
+bottom: 0;
+background: linear-gradient(135deg, rgba(26, 95, 63, 0.02), rgba(45, 134, 89, 0.05));
+opacity: 0;
+transition: opacity 0.4s ease;
+z-index: 1;
+    bottom: 0;
+    background: linear-gradient(135deg, rgba(26, 95, 63, 0.02), rgba(45, 134, 89, 0.05));
+    opacity: 0;
+    transition: opacity 0.4s ease;
+    z-index: 1;
+}
+
+.product-card:hover {
+    transform: scale(1.05) translateY(-5px);
+    box-shadow: 0 20px 40px rgba(26, 95, 63, 0.35);
+    border-color: #1a5f3f;
+    background: linear-gradient(135deg, #f0fdf4, #dcfce7);
+}
+
+.product-card:hover::before {
+    opacity: 1;
+}
+
+.product-card > * {
+    position: relative;
+    z-index: 2;
+}
+
+.product-image {
+    height: 140px;
+    background: #f8f9fa;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    position: relative;
+    overflow: hidden;
+    margin: 6px;
+    border-radius: 6px;
+}
+
+.product-image img {
+    width: 100%;
+    height: 100%;
+    object-fit: cover;
+    transition: transform 0.6s cubic-bezier(0.175, 0.885, 0.32, 1.275);
+}
+
+.product-card:hover .product-image img {
+    transform: scale(1.12);
+}
+
+.product-badge {
+    position: absolute;
+    top: 0.5rem;
+    right: 0.5rem;
+    background: #1a5f3f;
+    color: white;
+    padding: 0.2rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.7rem;
+    font-weight: 600;
+    transition: all 0.3s ease;
+    z-index: 3;
+    margin: 6px;
+}
+
+.product-card:hover .product-badge {
+    background: linear-gradient(135deg, #2d8659, #1a5f3f);
+    transform: scale(1.1);
+    box-shadow: 0 4px 12px rgba(26, 95, 63, 0.4);
+}
+
+.product-content {
+    padding: 0.8rem;
+    padding-top: 0.3rem;
+}
+
+.product-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: #1a5f3f;
+    margin-bottom: 0.4rem;
+    line-height: 1.3;
+}
+
+.product-description {
+    color: #6c757d;
+    margin-bottom: 0.8rem;
+    line-height: 1.4;
+    font-size: 0.85rem;
+}
+
+.product-meta {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    margin-bottom: 0.6rem;
+}
+
+.product-price {
+    font-size: 1.3rem;
+    font-weight: 700;
+    color: #1a5f3f;
+}
+
+.product-quantity {
+    color: #6c757d;
+    font-size: 0.8rem;
+}
+
+.product-views {
+    margin-bottom: 0.6rem;
+}
+
+.views-badge {
+    display: inline-flex;
+    align-items: center;
+    gap: 0.4rem;
+    background: linear-gradient(135deg, #f8f9fa, #e9ecef);
+    color: #6c757d;
+    padding: 0.3rem 0.6rem;
+    border-radius: 20px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    border: 1px solid #dee2e6;
+    transition: all 0.3s ease;
+}
+
+.views-badge:hover {
+    background: linear-gradient(135deg, #1a5f3f, #2d8659);
+    color: white;
+    transform: scale(1.05);
+}
+
+.views-badge i {
+    font-size: 0.7rem;
+}
+
+.product-actions {
+    display: flex;
+    gap: 0.4rem;
+    flex-wrap: wrap;
+}
+
+.btn-product {
+    padding: 0.4rem 0.8rem;
+    border-radius: 6px;
+    text-decoration: none;
+    font-size: 0.8rem;
+    font-weight: 500;
+    transition: all 0.3s ease;
+    display: inline-flex;
+    align-items: center;
+    gap: 0.2rem;
+}
+
+.btn-product-primary {
+    background: #1a5f3f;
+    color: white;
+}
+
+.btn-product-primary:hover {
+    background: #2d8659;
+}
+
+.btn-product-outline {
+    background: transparent;
+    color: #1a5f3f;
+    border: 1px solid #1a5f3f;
+}
+
+.btn-product-outline:hover {
+    background: #1a5f3f;
+    color: white;
+}
+
+.search-section {
+    padding: 60px 0;
+    background: transparent;
+    position: relative;
+    z-index: 2;
+}
+
+.search-container {
+    max-width: 800px;
+    margin: 0 auto;
+}
+
+.search-form {
+    background: rgba(255, 255, 255, 0.9);
+    padding: 2rem;
+    border-radius: 16px;
+    box-shadow: 0 8px 32px rgba(0,0,0,0.1);
+    backdrop-filter: blur(10px);
+    border: 1px solid rgba(255, 255, 255, 0.2);
+    transition: all 0.3s ease;
+}
+
+.search-form:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 12px 40px rgba(0,0,0,0.15);
+}
+
+.search-input-group {
+    display: grid;
+    grid-template-columns: 1fr 200px auto;
+    gap: 1rem;
+    align-items: end;
+}
+
+.form-input {
+    padding: 0.875rem 1rem;
+    border: 1px solid #e9ecef;
+    border-radius: 8px;
+    font-size: 0.95rem;
+    transition: all 0.3s ease;
+    background: rgba(255, 255, 255, 0.8);
+    -webkit-appearance: none;
+    -moz-appearance: none;
+    appearance: none;
+    background-image: url("data:image/svg+xml,%3csvg xmlns='http://www.w3.org/2000/svg' fill='none' viewBox='0 0 20 20'%3e%3cpath stroke='%236b7280' stroke-linecap='round' stroke-linejoin='round' stroke-width='1.5' d='M6 8l4 4 4-4'/%3e%3c/svg%3e");
+    background-position: right 0.5rem center;
+    background-repeat: no-repeat;
+    background-size: 1.5em 1.5em;
+    padding-right: 2.5rem;
+}
+
+.form-input:focus {
+    outline: none;
+    border-color: #1a5f3f;
+    box-shadow: 0 0 0 3px rgba(26, 95, 63, 0.1);
+}
+
+.form-input option {
+    background: white;
+    color: #333;
+    padding: 0.5rem;
+}
+
+/* Specific styling for select dropdown */
+select.form-input {
+    cursor: pointer;
+}
+
+select.form-input:hover {
+    border-color: #1a5f3f;
+}
+
+select.form-input:focus {
+    border-color: #1a5f3f;
+    background-color: rgba(255, 255, 255, 0.95);
+}
+
+.btn-search {
+    padding: 0.875rem 2rem;
+    background: #1a5f3f;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    font-weight: 500;
+    font-size: 0.95rem;
+    cursor: pointer;
+    transition: all 0.3s ease;
+}
+
+.btn-search:hover {
+    background: #2d8659;
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(26, 95, 63, 0.2);
+}
+
+.empty-state {
+    text-align: center;
+    padding: 4rem 2rem;
+}
+
+.empty-state-icon {
+    font-size: 4rem;
+    color: #dee2e6;
+    margin-bottom: 2rem;
+}
+
+.empty-state-title {
+    font-size: 1.5rem;
+    color: #6c757d;
+    margin-bottom: 1rem;
+}
+
+.empty-state-text {
+    color: #adb5bd;
+    margin-bottom: 2rem;
+}
+
+.about-section {
+    padding: 40px 0;
+    background: transparent;
+    position: relative;
+    z-index: 2;
+}
+
+.section-title {
+    font-size: 2.5rem;
+    font-weight: 700;
+    color: white;
+    margin-bottom: 1rem;
+    text-shadow: 2px 2px 4px rgba(0,0,0,0.5);
+}
+
+.section-subtitle {
+    font-size: 1.125rem;
+    color: rgba(255, 255, 255, 0.9);
+    margin-bottom: 1rem;
+    text-transform: uppercase;
+    letter-spacing: 1px;
+    text-shadow: 1px 1px 2px rgba(0,0,0,0.5);
+}
+
+.feature-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+    gap: 2rem;
+    margin-top: 1rem;
+}
+
+.feature-card {
+    background: rgba(255, 255, 255, 0.95);
+    padding: 2rem;
+    border-radius: 12px;
+    box-shadow: 0 5px 15px rgba(0,0,0,0.1);
+    transition: all 0.3s ease;
+    text-align: center;
+    backdrop-filter: blur(10px);
+}
+
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fit, minmax(280px, 350px));
+    gap: 1.5rem;
+    margin-top: 1.5rem;
+    justify-content: center;
+}
+
+.product-card {
+    margin-bottom: 1rem;
+    width: 100%;
+    max-width: 350px;
+    justify-self: center;
+    padding: 15px;
+    display: flex;
+    flex-direction: column;
+}
+
+.product-image {
+    height: 120px;
+    margin: 3px;
+    border-radius: 6px;
+}
+
+.product-content {
+    flex: 1;
+    display: flex;
+    flex-direction: column;
+    padding: 10px;
+}
+
+.product-title {
+    font-size: 0.9rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-description {
+    font-size: 0.8rem;
+    margin-bottom: 0.5rem;
+}
+
+.product-actions {
+    flex-direction: column;
+    gap: 0.5rem;
+    margin-top: auto;
+}
+
+.btn-product {
+    font-size: 0.7rem;
+    padding: 0.6rem 1rem;
+    width: 100%;
+    text-align: center;
+    box-sizing: border-box;
+}
+
+@media (max-width: 480px) {
+    .product-grid {
+        grid-template-columns: 1fr;
+        gap: 1.5rem;
+        margin-top: 1.5rem;
+        padding: 0 0.5rem;
+    }
+}
+
+@media (max-width: 768px) {
+    .hero-title {
+        font-size: 2.5rem;
+    }
+    
+    .search-input-group {
+        grid-template-columns: 1fr;
+        gap: 1rem;
+    }
+    
+    .hero-buttons {
+        flex-direction: column;
+        align-items: center;
+    }
+    
+    .btn-hero {
+        width: 100%;
+        max-width: 300px;
+        justify-content: center;
+    }
+}
+/* ===== HOW IT WORKS SECTION ===== */
+.how-it-works-section {
+    padding: 80px 0;
+    background: transparent; /* поверх видео — как hero и about */
+    position: relative;
+    z-index: 2;
+}
+
+/* Номер шага (1, 2, 3) — круглая плашка над карточкой */
+.feature-card {
+    position: relative; /* важно для позиционирования step-number */
+    overflow: visible;  /* чтобы плашка не обрезалась */
+}
+
+.step-number {
+    position: absolute;
+    top: -25px;
+    left: 50%;
+    transform: translateX(-50%);
+    width: 52px;
+    height: 52px;
+    background: linear-gradient(135deg, #1a5f3f, #2d8659);
+    color: #ffffff;
+    border-radius: 50%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    font-size: 1.4rem;
+    font-weight: 800;
+    box-shadow: 0 6px 18px rgba(26, 95, 63, 0.45);
+    border: 3px solid rgba(255, 255, 255, 0.95);
+    z-index: 10;
+    transition: all 0.3s ease;
+}
+
+/* При наведении на карточку — плашка слегка поднимается */
+.feature-card:hover .step-number {
+    transform: translateX(-50%) translateY(-4px);
+    box-shadow: 0 8px 22px rgba(26, 95, 63, 0.6);
+}
+
+/* Адаптация под мобильные — чтобы карточки не сжимались слишком сильно */
+@media (max-width: 768px) {
+    .how-it-works-section {
+        padding: 60px 0;
+    }
+    
+    .step-number {
+        width: 45px;
+        height: 45px;
+        font-size: 1.2rem;
+        top: -20px;
+    }
+}
+</style>
+
+<!-- Full Video Background -->
+<div class="full-video-background">
+    <video autoplay muted loop playsinline>
+        <source src="{{ url_for('static', filename='video/video.mp4') }}" type="video/mp4">
+    </video>
+    <div class="video-overlay"></div>
+</div>
+
+<!-- Hero Section -->
+<section class="hero-section">
+    <div class="container">
+        <div class="hero-content text-center">
+            <h1 class="hero-title">TURN SURPLUS MATERIALS INTO OPPORTUNITY</h1>
+            <p class="hero-subtitle">Helping businesses reduce waste and helping creators find affordable materials</p>
+            <div class="hero-buttons justify-content-center">
+                <a href="{{ url_for('search') }}" class="btn-hero btn-hero-primary">
+                    <i class="fas fa-search"></i> Browse Materials
+                </a>
+                {% if current_user.is_authenticated %}
+                    <a href="{{ url_for('sell') }}" class="btn-hero btn-hero-secondary">
+                        <i class="fas fa-plus"></i> Start Selling
+                    </a>
+                {% else %}
+                    <a href="{{ url_for('register') }}" class="btn-hero btn-hero-secondary">
+                        <i class="fas fa-user-plus"></i> Get Started
+                    </a>
+                {% endif %}
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- About Section -->
+<section class="about-section">
+    <div class="container">
+        <h2 class="section-title text-center">WHY ECOCHAIN?</h2>
+        <p class="section-subtitle text-center">What makes us special</p>
+        
+        <div class="feature-grid">
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-leaf"></i>
+                </div>
+                <h3 class="feature-title">Less Waste</h3>
+                <p class="feature-description">Keep useful materials in circulation instead of sending them to waste</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-handshake"></i>
+                </div>
+                <h3 class="feature-title">More Value</h3>
+                <p class="feature-description">Turn surplus resources into income and opportunity</p>
+            </div>
+            
+            <div class="feature-card">
+                <div class="feature-icon">
+                    <i class="fas fa-globe"></i>
+                </div>
+                <h3 class="feature-title">Smarter Connections</h3>
+                <p class="feature-description">Link businesses with creators, schools, and local manufacturers</p>
+            </div>
+        </div>
+    </div>
+</section>
+
+<!-- How It Works Section -->
+<!-- How It Works Section -->
+<section class="how-it-works-section">
+    <div class="container">
+        <h2 class="section-title text-center">How It Works</h2>
+        <p class="section-subtitle text-center">Three simple steps to turn waste into opportunity</p>
+        
+        <div class="feature-grid">
+            <!-- Step 1 -->
+            <div class="feature-card">
+                <div class="step-number">1</div>
+                <div class="feature-icon">
+                    <i class="fas fa-upload"></i>
+                </div>
+                <h3 class="feature-title">List Materials</h3>
+                <p class="feature-description">
+                    Businesses upload leftover materials with price, quantity, and photos.
+                </p>
+            </div>
+
+            <!-- Step 2 -->
+            <div class="feature-card">
+                <div class="step-number">2</div>
+                <div class="feature-icon">
+                    <i class="fas fa-search"></i>
+                </div>
+                <h3 class="feature-title">Browse and Connect</h3>
+                <p class="feature-description">
+                    Buyers search categories and contact sellers directly.
+                </p>
+            </div>
+
+            <!-- Step 3 -->
+            <div class="feature-card">
+                <div class="step-number">3</div>
+                <div class="feature-icon">
+                    <i class="fas fa-recycle"></i>
+                </div>
+                <h3 class="feature-title">Reuse and Create Value</h3>
+                <p class="feature-description">
+                    Materials get a second life instead of becoming waste.
+                </p>
+            </div>
+        </div>
+    </div>
+</section>
+
+
+
+<!-- Floating Eco Button (only on home page) -->
+<div id="eco-overlay">
+    <div id="eco-message"></div>
+</div>
+<button id="eco-button">Eco Tip</button>
+
+<script>
+// Eco Tip functionality
+const ecoTips = [
+    "Recycling one ton of paper saves 17 trees!",
+    "Using recycled steel reduces energy consumption by 74%.",
+    "Recycled plastics can be reused 7-9 times before disposal.",
+    "Bamboo grows 30x faster than traditional trees.",
+    "Recycled glass uses 30% less energy than new glass."
+];
+
+document.getElementById('eco-button').addEventListener('click', function() {
+    const tip = ecoTips[Math.floor(Math.random() * ecoTips.length)];
+    document.getElementById('eco-message').textContent = tip;
+    document.getElementById('eco-overlay').style.display = 'flex';
+});
+
+document.getElementById('eco-overlay').addEventListener('click', function() {
+    this.style.display = 'none';
+});
+
+// AJAX favorite functionality
+document.addEventListener('DOMContentLoaded', function() {
+    const favoriteButtons = document.querySelectorAll('.btn-product-outline[href*="toggle_favorite"]');
+    
+    favoriteButtons.forEach(button => {
+        button.addEventListener('click', function(e) {
+            e.preventDefault();
+            
+            const productId = this.getAttribute('href').match(/toggle_favorite\/(\d+)/)[1];
+            const buttonElement = this;
+            
+            fetch(`/toggle_favorite/${productId}`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Content-Type': 'application/json',
+                    'X-CSRFToken': '{{ csrf_token() }}'
+                }
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        // Toggle the heart state
+                        if (buttonElement.innerHTML.includes('far fa-heart')) {
+                            // Add to favorites
+                            buttonElement.innerHTML = '<i class="fas fa-heart"></i> Favorited';
+                        } else {
+                            // Remove from favorites
+                            buttonElement.innerHTML = '<i class="far fa-heart"></i> Save';
+                        }
+                        
+                        // Show flash message
+                        showFlashMessage(data.message, data.action === 'added' ? 'success' : 'info');
+                    }
+                })
+                .catch(error => console.error('Error toggling favorite:', error));
+        });
+    });
+    
+    function showFlashMessage(message, type) {
+        const flashDiv = document.createElement('div');
+        flashDiv.className = `alert alert-${type} alert-dismissible fade show position-fixed top-0 start-50 translate-middle-x mt-3`;
+        flashDiv.style.zIndex = '9999';
+        flashDiv.innerHTML = `
+            ${message}
+            <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+        `;
+        
+        document.body.appendChild(flashDiv);
+        
+        // Auto-dismiss after 3 seconds
+        setTimeout(() => {
+            if (flashDiv.parentNode) {
+                flashDiv.remove();
+            }
+        }, 3000);
+    }
+});
+</script>
+
+<style>
+#eco-overlay {
+    position: fixed;
+    top: 0; left: 0;
+    width: 100%; height: 100%;
+    backdrop-filter: blur(10px);
+    background: rgba(0, 0, 0, 0.5);
+    display: none;
+    justify-content: center;
+    align-items: center;
+    z-index: 2000;
+}
+
+#eco-message {
+    background: white;
+    border-radius: 20px;
+    padding: 40px 50px;
+    max-width: 700px;
+    box-shadow: 0 0 25px rgba(0,0,0,0.3);
+    font-size: 22px;
+    line-height: 1.6;
+    text-align: center;
+    position: relative;
+    animation: fadeInUp 0.4s ease;
+}
+
+#eco-message::before {
+    content: "";
+    position: absolute;
+    top: -4px; left: -4px; right: -4px; bottom: -4px;
+    border-radius: 24px;
+    background-size: 400% 400%;
+    z-index: -1;
+}
+
+
+@keyframes fadeInUp {
+    from {
+        opacity: 0;
+        transform: translateY(50px);
+    }
+    to {
+        opacity: 1;
+        transform: translateY(0);
+    }
+}
+
+#eco-button {
+    background: linear-gradient(135deg, #1a5f3f, #2d8659);
+    color: white;
+    font-weight: bold;
+    padding: 12px 24px;
+    border-radius: 30px;
+    border: none;
+    cursor: pointer;
+    transition: box-shadow 0.3s ease, transform 0.2s ease;
+    position: fixed;
+    bottom: 70px;
+    right: 20px;
+    z-index: 2100;
+}
+
+#eco-button:hover {
+    box-shadow: 0 0 25px rgba(26, 95, 63, 0.9);
+    transform: scale(1.08);
+}
+</style>
+{% endblock %}

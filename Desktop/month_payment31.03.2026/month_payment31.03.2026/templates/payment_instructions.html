@@ -1,0 +1,101 @@
+{% extends "layout.html" %}
+
+{% block title %}Payment Instructions{% endblock %}
+
+{% block content %}
+<div class="container mt-4">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card">
+                <div class="card-header bg-primary text-white">
+                    <h4 class="mb-0">
+                        <i class="fas fa-coins"></i>
+                        Add Funds to Your Account
+                    </h4>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-info">
+                        <h5><i class="fas fa-info-circle"></i> How it works:</h5>
+                        <p>1 token = 1 TMT. Choose your preferred payment method below.</p>
+                    </div>
+
+                    
+                    <!-- SMS Payment Method (Alternative) -->
+                    <div class="card border-warning mb-4">
+                        <div class="card-header bg-warning text-dark">
+                            <h5 class="mb-0">
+                                <i class="fas fa-sms"></i> SMS Payment (Alternative)
+                            </h5>
+                        </div>
+                        <div class="card-body">
+                            <div class="row mb-3">
+                                <div class="col-md-6">
+                                    <div class="card border-info">
+                                        <div class="card-body text-center">
+                                            <h5 class="card-title text-info">Send SMS to:</h5>
+                                            <h2 class="display-4 text-primary">+99364254610</h2>
+                                            <p class="text-muted">(Your phone number here)</p>
+                                        </div>
+                                    </div>
+                                </div>
+                                <div class="col-md-6">
+                                    <div class="card border-info">
+                                        <div class="card-body">
+                                            <h5 class="card-title text-info">SMS Format:</h5>
+                                            <p class="font-weight-bold">PAY [amount]</p>
+                                            <p class="text-muted">Example: PAY 5 example@gmail.com</p>
+                                            <p class="text-muted">Example: PAY 10 example@gmail.com</p>
+                                        </div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <div class="alert alert-warning">
+                                <h6><i class="fas fa-exclamation-triangle"></i> Note:</h6>
+                                <p class="mb-0">SMS may have carrier charges and might not work from Turkmenistan. Telegram is recommended for Turkmenistan users.</p>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="row">
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">Current Balance</h6>
+                                </div>
+                                <div class="card-body text-center">
+                                    <h3 class="text-primary">{{ "%.2f"|format(balance) }} tokens</h3>
+                                    <p class="text-muted">{{ "%.2f"|format(balance) }} TMT</p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6">
+                            <div class="card">
+                                <div class="card-header bg-light">
+                                    <h6 class="mb-0">What You Can Do</h6>
+                                </div>
+                                <div class="card-body">
+                                    <ul class="list-unstyled mb-0">
+                                        <li><i class="fas fa-check text-success"></i> Sell products (1 token)</li>
+                                        <li><i class="fas fa-check text-success"></i> View seller numbers (1 token)</li>
+                                        <li><i class="fas fa-check text-success"></i> Premium features</li>
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+
+                    <div class="mt-4 text-center">
+                        <a href="{{ url_for('dashboard') }}" class="btn btn-secondary">
+                            <i class="fas fa-arrow-left"></i> Back to Dashboard
+                        </a>
+                        <button onclick="location.reload()" class="btn btn-primary">
+                            <i class="fas fa-sync"></i> Refresh Balance
+                        </button>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,482 @@
+{% extends "layout.html" %}
+
+{% block title %}Dashboard - EcoMaterial Hub{% endblock %}
+
+{% block content %}
+<style>
+/* Import modern fonts */
+@import url('https://fonts.googleapis.com/css2?family=Inter:wght@300;400;500;600;700&display=swap');
+
+/* Global Styles */
+body {
+    background-color: #f7f9fc !important;
+    line-height: 1.6 !important;
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif !important;
+}
+
+/* Dashboard Container */
+.dashboard {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 2rem 1rem;
+}
+
+/* Card Styles */
+.card {
+    background: rgba(255, 255, 255, 0.95) !important;
+    border: none !important;
+    border-radius: 12px !important;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.05) !important;
+    margin-bottom: 1.5rem;
+    transition: all 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 8px 20px rgba(0, 0, 0, 0.08);
+}
+
+.card-header {
+    border: none !important;
+    border-radius: 12px 12px 0 0 !important;
+    font-weight: 500;
+}
+
+/* Header Styles */
+.card-title {
+    font-weight: 600;
+    font-size: 1.5rem;
+    margin-bottom: 0.5rem;
+    color: #2c3e50;
+}
+
+/* Typography Hierarchy */
+h2, h3, h4, h5 {
+    font-family: 'Inter', sans-serif;
+    font-weight: 600;
+}
+
+h2 {
+    font-size: 1.75rem;
+    color: #1a202c;
+}
+
+h3 {
+    font-size: 1.5rem;
+    color: #2c3e50;
+}
+
+h5 {
+    font-size: 1.1rem;
+    font-weight: 500;
+}
+
+/* Status Cards */
+.text-success {
+    color: #10b981 !important;
+}
+
+.text-primary {
+    color: #6366f1 !important;
+}
+
+.text-warning {
+    color: #f59e0b !important;
+}
+
+.text-danger {
+    color: #ef4444 !important;
+}
+
+.text-muted {
+    color: #6c757d !important;
+    font-weight: 400;
+}
+
+/* Account Balance Card */
+.border-primary {
+    border: 1px solid #e3e8f7 !important;
+}
+
+.bg-primary {
+    background: linear-gradient(135deg, #6366f1, #4f46e5) !important;
+}
+
+.text-primary h2 {
+    color: #818cf8 !important;
+    font-weight: 700;
+}
+
+/* Quick Actions Card */
+.border-success {
+    border: 1px solid #d1fae5 !important;
+}
+
+.bg-success {
+    background: linear-gradient(135deg, #10b981, #059669) !important;
+}
+
+/* Button Styles */
+.btn {
+    border-radius: 12px !important;
+    font-weight: 500;
+    font-size: 0.9rem;
+    padding: 0.5rem 1rem;
+    transition: all 0.3s ease;
+    border: none;
+}
+
+.btn-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+    border: 1px solid #0d6efd;
+    color: white;
+}
+
+.btn-success:hover {
+    background: linear-gradient(135deg, #059669, #047857);
+    transform: translateY(-1px);
+    box-shadow: 0 4px 12px rgba(16, 185, 129, 0.2);
+}
+
+.btn-outline-primary {
+    background: transparent;
+    border: 1px solid #6366f1;
+    color: #6366f1;
+}
+
+.btn-outline-primary:hover {
+    background: #6366f1;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-sm {
+    font-size: 0.8rem;
+    padding: 0.4rem 0.8rem;
+    font-weight: 400;
+}
+
+/* Table Styles */
+.table {
+    background: white;
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+.table thead th {
+    background: #f8f9fa;
+    border-bottom: 2px solid #eaedf1;
+    padding: 1rem 0.75rem;
+    font-weight: 600;
+    color: #374151;
+    font-size: 0.9rem;
+}
+
+.table tbody td {
+    padding: 1rem 0.75rem;
+    vertical-align: middle;
+    border-bottom: 1px solid #eaedf1;
+}
+
+.table tbody tr:hover {
+    background: #f8f9fa;
+}
+
+.table tbody tr:last-child td {
+    border-bottom: none;
+}
+
+/* Status Badges */
+.badge {
+    border-radius: 12px;
+    font-size: 0.75rem;
+    font-weight: 500;
+    padding: 0.4rem 0.6rem;
+}
+
+.bg-success {
+    background: linear-gradient(135deg, #10b981, #059669);
+}
+
+.bg-warning {
+    background: linear-gradient(135deg, #f59e0b, #d97706);
+}
+
+.bg-secondary {
+    background: linear-gradient(135deg, #6c757d, #495057);
+}
+
+/* Action Links */
+.btn-outline-success, .btn-outline-primary, .btn-outline-danger {
+    background: transparent;
+    border: 1px solid #6c757d;
+    color: #6c757d;
+    padding: 0.35rem 0.7rem;
+    font-size: 0.8rem;
+    font-weight: 400;
+    border-radius: 8px;
+    transition: all 0.2s ease;
+}
+
+.btn-outline-success:hover {
+    background: #10b981;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-outline-primary:hover {
+    background: #6366f1;
+    color: white;
+    transform: translateY(-1px);
+}
+
+.btn-outline-danger:hover {
+    background: #ef4444;
+    color: white;
+    transform: translateY(-1px);
+}
+
+/* Spacing */
+.mb-4 {
+    margin-bottom: 2rem !important;
+}
+
+.mb-3 {
+    margin-bottom: 1.5rem !important;
+}
+
+.mb-0 {
+    margin-bottom: 0 !important;
+}
+
+/* Modal Styles */
+.modal-content {
+    border-radius: 12px;
+    border: none;
+    box-shadow: 0 10px 30px rgba(0, 0, 0, 0.15);
+}
+
+.modal-header {
+    border-bottom: 1px solid #eaedf1;
+    background: #f8f9fa;
+    border-radius: 12px 12px 0 0;
+}
+
+.modal-footer {
+    border-top: 1px solid #eaedf1;
+    background: #f8f9fa;
+    border-radius: 0 0 12px 12px;
+}
+
+/* Responsive */
+@media (max-width: 768px) {
+    .dashboard {
+        padding: 1rem 0.5rem;
+    }
+    
+    .card {
+        margin-bottom: 1rem;
+    }
+}
+</style>
+
+<div class="dashboard">
+    <!-- Stats Cards -->
+    <div class="row mb-4">
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-success">{{ products|length }}</h3>
+                    <p class="text-muted">Total Products</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-primary">{{ products|selectattr('status', 'equalto', 'Available')|list|length }}</h3>
+                    <p class="text-muted">Available</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-warning">{{ products|selectattr('status', 'equalto', 'Reserved')|list|length }}</h3>
+                    <p class="text-muted">Reserved</p>
+                </div>
+            </div>
+        </div>
+        <div class="col-md-3">
+            <div class="card text-center">
+                <div class="card-body">
+                    <h3 class="text-danger">{{ products|selectattr('status', 'equalto', 'Sold')|list|length }}</h3>
+                    <p class="text-muted">Sold</p>
+                </div>
+            </div>
+        </div>
+    </div>
+
+    <!-- My Products Section -->
+    <div class="card">
+        <div class="card-body">
+            <div class="d-flex justify-content-between align-items-center mb-4">
+                <h3 class="mb-0">My Products</h3>
+                <a href="{{ url_for('sell') }}" class="btn btn-success">
+                    <i class="fas fa-plus"></i> Add New Product
+                </a>
+            </div>
+            
+            {% if products %}
+                <div class="table-responsive">
+                    <table class="table table-hover">
+                        <thead>
+                            <tr>
+                                <th>Product</th>
+                                <th>Category</th>
+                                <th>Price</th>
+                                <th>Quantity</th>
+                                <th>Status</th>
+                                <th>Actions</th>
+                            </tr>
+                        </thead>
+                        <tbody>
+                            {% for product in products %}
+                                <tr id="product-row-{{ product.id }}">
+                                    <td>
+                                        <div class="d-flex align-items-center">
+                                            {% if product.photo_filename %}
+                                                <img src="{{ url_for('static', filename='uploads/' + product.photo_filename) }}" 
+                                                     alt="{{ product.title }}" class="rounded me-2" style="width: 40px; height: 40px; object-fit: cover;">
+                                            {% else %}
+                                                <div class="rounded me-2 bg-light d-flex align-items-center justify-content-center" style="width: 40px; height: 40px;">
+                                                    <i class="fas fa-box text-success"></i>
+                                                </div>
+                                            {% endif %}
+                                            <div>
+                                                <strong>{{ product.title }}</strong>
+                                                <br>
+                                                <small class="text-muted">{{ product.created_at.strftime('%B %d, %Y') }}</small>
+                                            </div>
+                                        </div>
+                                    </td>
+                                    <td>{{ product.category.name }}</td>
+                                    <td>{{ "%.2f"|format(product.price) }} TMT</td>
+                                    <td>{{ product.quantity }}</td>
+                                    <td>
+                                        <span class="badge bg-{{ 'success' if product.status == 'Available' else 'warning' if product.status == 'Reserved' else 'secondary' }}">
+                                            {{ product.status }}
+                                        </span>
+                                    </td>
+                                    <td>
+                                        <a href="{{ url_for('product_detail', product_id=product.id) }}" class="btn btn-outline-success">
+                                            <i class="fas fa-eye"></i> View
+                                        </a>
+                                        <a href="{{ url_for('edit_product', product_id=product.id) }}" class="btn btn-outline-primary">
+                                            <i class="fas fa-edit"></i> Edit
+                                        </a>
+                                        <button type="button" class="btn btn-outline-danger ajax-delete-product" 
+                                                data-product-id="{{ product.id }}"
+                                                data-product-title="{{ product.title }}">
+                                            <i class="fas fa-trash"></i> Delete
+                                        </button>
+                                    </td>
+                                </tr>
+                            {% endfor %}
+                        </tbody>
+                    </table>
+                </div>
+            {% else %}
+                <div class="text-center py-5">
+                    <i class="fas fa-box fa-3x text-muted mb-3"></i>
+                    <h4>No products yet</h4>
+                    <p class="text-muted">Start listing your products to see them here</p>
+                    <a href="{{ url_for('sell') }}" class="btn btn-success">
+                        <i class="fas fa-plus"></i> Add Your First Product
+                    </a>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+</div>
+
+<!-- Delete Product Modal -->
+<div class="modal fade" id="deleteProductModal" tabindex="-1">
+    <div class="modal-dialog">
+        <div class="modal-content">
+            <div class="modal-header">
+                <h5 class="modal-title"><i class="fas fa-exclamation-triangle text-warning"></i> Confirm Delete</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <p>Are you sure you want to delete <strong id="delete-product-title"></strong>?</p>
+                <p class="text-muted">This action cannot be undone.</p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Cancel</button>
+                <button type="button" class="btn btn-danger" id="confirm-delete-product">
+                    <i class="fas fa-trash"></i> Delete
+                </button>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    const csrfToken = document.querySelector('meta[name="csrf-token"]')?.content;
+    let deleteProductId = null;
+    
+    // Delete product AJAX
+    document.querySelectorAll('.ajax-delete-product').forEach(btn => {
+        btn.addEventListener('click', function() {
+            deleteProductId = this.dataset.productId;
+            document.getElementById('delete-product-title').textContent = this.dataset.productTitle;
+            new bootstrap.Modal(document.getElementById('deleteProductModal')).show();
+        });
+    });
+    
+    document.getElementById('confirm-delete-product').addEventListener('click', async function() {
+        this.disabled = true;
+        this.innerHTML = '<i class="fas fa-spinner fa-spin"></i> Deleting...';
+        
+        try {
+            const response = await fetch(`/product/${deleteProductId}/delete`, {
+                method: 'POST',
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'X-CSRFToken': csrfToken
+                }
+            });
+            
+            const result = await response.json();
+            
+            if (response.ok && result.success) {
+                // Remove row
+                const row = document.getElementById(`product-row-${deleteProductId}`);
+                row.style.transition = 'opacity 0.3s';
+                row.style.opacity = '0';
+                setTimeout(() => row.remove(), 300);
+                
+                bootstrap.Modal.getInstance(document.getElementById('deleteProductModal')).hide();
+                
+                // Show success message
+                const alert = document.createElement('div');
+                alert.className = 'alert alert-success alert-dismissible fade show';
+                alert.innerHTML = `${result.message}<button type="button" class="btn-close" data-bs-dismiss="alert"></button>`;
+                document.querySelector('.container').insertBefore(alert, document.querySelector('.container').firstChild);
+                setTimeout(() => alert.remove(), 3000);
+            } else {
+                alert(result.error || 'Failed to delete');
+            }
+        } catch (error) {
+            alert('Network error');
+        } finally {
+            this.disabled = false;
+            this.innerHTML = '<i class="fas fa-trash"></i> Delete';
+        }
+    });
+});
+</script>
+{% endblock %}

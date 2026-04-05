@@ -1,0 +1,74 @@
+{% extends "layout.html" %}
+
+{% block title %}Subscription Expired - EcoMaterial Hub{% endblock %}
+
+{% block content %}
+<div class="container mt-5">
+    <div class="row justify-content-center">
+        <div class="col-md-8">
+            <div class="card text-center">
+                <div class="card-header bg-warning text-dark">
+                    <h3 class="mb-0">
+                        <i class="fas fa-exclamation-triangle"></i> Subscription Expired
+                    </h3>
+                </div>
+                <div class="card-body">
+                    <div class="alert alert-warning">
+                        <h4 class="alert-heading">Your access has expired!</h4>
+                        <p>Your trial period has ended and you don't have an active subscription.</p>
+                    </div>
+                    
+                    <div class="mb-4">
+                        <h5>Monthly Subscription: <strong>5 manat</strong></h5>
+                        <p class="text-muted">30 days full access to all platform features</p>
+                    </div>
+                    
+                    <hr>
+                    
+                    <h5 class="mb-3">Payment Methods:</h5>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6><i class="fab fa-telegram text-primary"></i> Telegram Payment</h6>
+                                    <p class="small text-muted">Send payment via Telegram</p>
+                                    <ol class="text-start small">
+                                        <li>Send <strong>5 manat</strong> to Telegram bot</li>
+                                        <li>Include your username: <strong>{{ current_user.username }}</strong></li>
+                                        <li>Your subscription will activate automatically</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-6 mb-3">
+                            <div class="card h-100">
+                                <div class="card-body">
+                                    <h6><i class="fas fa-sms text-success"></i> SMS Payment</h6>
+                                    <p class="small text-muted">Send SMS from your registered phone</p>
+                                    <ol class="text-start small">
+                                        <li>Send SMS: <strong>PAY 5</strong></li>
+                                        <li>To: <strong>+994 XX XXX XX XX</strong></li>
+                                        <li>From your registered phone</li>
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                    
+                    <hr>
+                    
+                    <div class="mt-4">
+                        <a href="{{ url_for('home') }}" class="btn btn-outline-secondary">
+                            <i class="fas fa-home"></i> Back to Home
+                        </a>
+                        <a href="{{ url_for('profile') }}" class="btn btn-outline-primary ms-2">
+                            <i class="fas fa-user"></i> Update Payment Info
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+{% endblock %}

@@ -1,0 +1,582 @@
+/* Sustainable Tech Color Palette */
+:root {
+    --forest-green: #2E7D32;
+    --mint: #A5D6A7;
+    --slate: #37474F;
+    --light-mint: #C8E6C9;
+    --dark-slate: #263238;
+    --white: #FFFFFF;
+    --light-gray: #F5F5F5;
+}
+
+* {
+    margin: 0;
+    padding: 0;
+    box-sizing: border-box;
+}
+
+body {
+    font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+    background-color: var(--light-gray);
+    color: var(--slate);
+    line-height: 1.6;
+}
+
+/* Desktop Navigation */
+.desktop-nav {
+    display: none;
+    background: var(--white);
+    box-shadow: 0 2px 10px rgba(0,0,0,0.1);
+    position: sticky;
+    top: 0;
+    z-index: 1000;
+}
+
+.nav-container {
+    max-width: 1200px;
+    margin: 0 auto;
+    padding: 1rem 2rem;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+}
+
+.nav-brand h1 {
+    color: var(--forest-green);
+    font-size: 1.5rem;
+}
+
+.nav-brand i {
+    margin-right: 0.5rem;
+}
+
+.nav-menu {
+    display: flex;
+    gap: 2rem;
+}
+
+.nav-link {
+    text-decoration: none;
+    color: var(--slate);
+    font-weight: 500;
+    transition: color 0.3s ease;
+    display: flex;
+    align-items: center;
+    gap: 0.5rem;
+}
+
+.nav-link:hover {
+    color: var(--forest-green);
+}
+
+/* Mobile Navigation */
+.mobile-nav {
+    display: flex;
+    justify-content: space-around;
+    align-items: center;
+    background: var(--white);
+    box-shadow: 0 -2px 10px rgba(0,0,0,0.1);
+    position: fixed;
+    bottom: 0;
+    left: 0;
+    right: 0;
+    z-index: 1000;
+    padding: 0.5rem 0;
+}
+
+.nav-item {
+    display: flex;
+    flex-direction: column;
+    align-items: center;
+    text-decoration: none;
+    color: var(--slate);
+    font-size: 0.75rem;
+    transition: color 0.3s ease;
+    padding: 0.5rem;
+}
+
+.nav-item i {
+    font-size: 1.25rem;
+    margin-bottom: 0.25rem;
+}
+
+.nav-item.active,
+.nav-item:hover {
+    color: var(--forest-green);
+}
+
+/* Main Content */
+.main-content {
+    min-height: calc(100vh - 80px);
+    padding: 1rem;
+    padding-bottom: 100px; /* Space for mobile nav */
+    max-width: 1200px;
+    margin: 0 auto;
+}
+
+/* Flash Messages */
+.flash-container {
+    position: fixed;
+    top: 20px;
+    right: 20px;
+    z-index: 1001;
+    max-width: 400px;
+    width: calc(100% - 40px);
+}
+
+.flash-message {
+    background: var(--white);
+    border-radius: 12px;
+    padding: 1rem;
+    margin-bottom: 1rem;
+    box-shadow: 0 4px 20px rgba(0,0,0,0.15);
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
+    animation: slideIn 0.3s ease-out;
+    border-left: 4px solid;
+}
+
+.flash-success {
+    border-left-color: var(--forest-green);
+    background: linear-gradient(135deg, var(--light-mint), var(--white));
+}
+
+.flash-success .flash-content i {
+    color: var(--forest-green);
+}
+
+.flash-error {
+    border-left-color: #d32f2f;
+    background: linear-gradient(135deg, #ffebee, var(--white));
+}
+
+.flash-error .flash-content i {
+    color: #d32f2f;
+}
+
+.flash-info {
+    border-left-color: #1976d2;
+    background: linear-gradient(135deg, #e3f2fd, var(--white));
+}
+
+.flash-info .flash-content i {
+    color: #1976d2;
+}
+
+.flash-content {
+    display: flex;
+    align-items: center;
+    gap: 0.75rem;
+    flex: 1;
+}
+
+.flash-content i {
+    font-size: 1.25rem;
+}
+
+.flash-content span {
+    font-weight: 500;
+    color: var(--slate);
+}
+
+.flash-close {
+    background: none;
+    border: none;
+    color: #999;
+    cursor: pointer;
+    padding: 0.25rem;
+    border-radius: 4px;
+    transition: all 0.2s ease;
+}
+
+.flash-close:hover {
+    background: rgba(0,0,0,0.1);
+    color: var(--slate);
+}
+
+@keyframes slideIn {
+    from {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+    to {
+        transform: translateX(0);
+        opacity: 1;
+    }
+}
+
+@keyframes slideOut {
+    from {
+        transform: translateX(0);
+        opacity: 1;
+    }
+    to {
+        transform: translateX(100%);
+        opacity: 0;
+    }
+}
+
+/* Mobile Flash Messages */
+@media (max-width: 768px) {
+    .flash-container {
+        top: 10px;
+        right: 10px;
+        left: 10px;
+        max-width: none;
+        width: calc(100% - 20px);
+    }
+    
+    .flash-message {
+        padding: 0.75rem;
+        font-size: 0.9rem;
+    }
+    
+    .flash-content i {
+        font-size: 1rem;
+    }
+}
+
+/* Cards */
+.card {
+    background: var(--white);
+    border-radius: 12px;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    padding: 1.5rem;
+    margin-bottom: 1rem;
+    transition: transform 0.3s ease, box-shadow 0.3s ease;
+}
+
+.card:hover {
+    transform: translateY(-2px);
+    box-shadow: 0 6px 20px rgba(0,0,0,0.15);
+}
+
+/* Buttons */
+.btn {
+    display: inline-block;
+    padding: 0.75rem 1.5rem;
+    border: none;
+    border-radius: 8px;
+    text-decoration: none;
+    font-weight: 500;
+    cursor: pointer;
+    transition: all 0.3s ease;
+    text-align: center;
+}
+
+.btn-primary {
+    background: var(--forest-green);
+    color: var(--white);
+}
+
+.btn-primary:hover {
+    background: #1B5E20;
+    transform: translateY(-1px);
+}
+
+.btn-secondary {
+    background: var(--mint);
+    color: var(--forest-green);
+}
+
+.btn-secondary:hover {
+    background: var(--light-mint);
+}
+
+.btn-outline {
+    background: transparent;
+    color: var(--forest-green);
+    border: 2px solid var(--forest-green);
+}
+
+.btn-outline:hover {
+    background: var(--forest-green);
+    color: var(--white);
+}
+
+/* Forms */
+.form-group {
+    margin-bottom: 1.5rem;
+}
+
+.form-label {
+    display: block;
+    margin-bottom: 0.5rem;
+    font-weight: 500;
+    color: var(--slate);
+}
+
+.form-control {
+    width: 100%;
+    padding: 0.75rem;
+    border: 2px solid #E0E0E0;
+    border-radius: 8px;
+    font-size: 1rem;
+    transition: border-color 0.3s ease;
+}
+
+.form-control:focus {
+    outline: none;
+    border-color: var(--forest-green);
+}
+
+/* Product Grid */
+.product-grid {
+    display: grid;
+    grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+    gap: 1.5rem;
+    margin-top: 2rem;
+}
+
+.product-card {
+    background: var(--white);
+    border-radius: 12px;
+    overflow: hidden;
+    box-shadow: 0 4px 15px rgba(0,0,0,0.1);
+    transition: transform 0.3s ease;
+}
+
+.product-card:hover {
+    transform: translateY(-4px);
+}
+
+.product-image {
+    width: 100%;
+    height: 200px;
+    object-fit: cover;
+    background: var(--light-mint);
+}
+
+.product-info {
+    padding: 1rem;
+}
+
+.product-title {
+    font-size: 1.1rem;
+    font-weight: 600;
+    color: var(--slate);
+    margin-bottom: 0.5rem;
+}
+
+.product-price {
+    font-size: 1.25rem;
+    color: var(--forest-green);
+    font-weight: 700;
+}
+
+.product-category {
+    display: inline-block;
+    background: var(--mint);
+    color: var(--forest-green);
+    padding: 0.25rem 0.75rem;
+    border-radius: 20px;
+    font-size: 0.8rem;
+    margin-top: 0.5rem;
+}
+
+/* Responsive Design */
+@media (min-width: 768px) {
+    .desktop-nav {
+        display: block;
+    }
+    
+    .mobile-nav {
+        display: none;
+    }
+    
+    .main-content {
+        padding: 2rem;
+        padding-bottom: 2rem;
+    }
+    
+    .nav-container {
+        padding: 1rem 3rem;
+    }
+    
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+    }
+}
+
+@media (min-width: 1024px) {
+    .product-grid {
+        grid-template-columns: repeat(auto-fill, minmax(350px, 1fr));
+    }
+}
+
+/* Utility Classes */
+.text-center { text-align: center; }
+.text-muted { color: #666; }
+.mt-1 { margin-top: 1rem; }
+.mt-2 { margin-top: 2rem; }
+.mb-1 { margin-bottom: 1rem; }
+.mb-2 { margin-bottom: 2rem; }
+
+/* Карточка кликабельная */
+.product-card {
+    cursor: pointer;
+    transition: transform 0.3s ease, box-shadow 0.3s ease, opacity 0.3s ease;
+}
+
+/* Эффект при наведении */
+.product-card:hover {
+    transform: translateY(-6px) scale(1.02);
+    box-shadow: 0 12px 24px rgba(0,0,0,0.15);
+    opacity: 0.97;
+}
+
+/* Лёгкое затемнение / масштабирование фото при наведении */
+.product-card:hover .card-img-top,
+.product-card:hover img {
+    opacity: 0.94;
+    transform: scale(1.025);
+    transition: all 0.45s ease;
+}
+
+/* Анимация появления карточек при загрузке */
+.product-card {
+    opacity: 0;
+    transform: translateY(20px);
+}
+
+.product-card.loaded {
+    opacity: 1;
+    transform: translateY(0);
+    transition: all 0.4s ease;
+}
+
+/* гамбургер-кнопка */
+#menu-toggle {
+    font-size: 28px;
+    cursor: pointer;
+    position: fixed;
+    top: 20px;
+    left: 20px;
+    z-index: 3000;
+    color: #2e7d32; /* твой forest-green */
+    transition: transform 0.3s ease;
+}
+
+#menu-toggle:hover {
+    transform: scale(1.2);
+}
+
+/* --- ENHANCEMENTS START HERE --- */
+
+/* 1. Improved root variables for better depth and modern look */
+:root {
+    --glass-bg: rgba(255, 255, 255, 0.7);
+    --glass-border: rgba(255, 255, 255, 0.3);
+    --accent-gradient: linear-gradient(135deg, var(--forest-green), #43A047);
+    --soft-shadow: 0 8px 32px 0 rgba(31, 38, 135, 0.07);
+}
+
+/* 2. Global Smooth Scrolling for better UX */
+html {
+    scroll-behavior: smooth;
+}
+
+/* 3. Glassmorphism effect for the Desktop Navigation */
+.desktop-nav {
+    background: var(--glass-bg) !important;
+    backdrop-filter: blur(10px);
+    -webkit-backdrop-filter: blur(10px);
+    border-bottom: 1px solid var(--glass-border);
+}
+
+/* 4. Modern Typography adjustments */
+h1, h2, h3 {
+    letter-spacing: -0.02em;
+    color: var(--dark-slate);
+}
+
+/* 5. Enhanced Product Cards with better hover state and transitions */
+.product-card {
+    border: 1px solid rgba(0,0,0,0.05);
+    background: var(--white);
+    /* Adding a subtle fade-in animation trigger for JS 'loaded' class */
+    transition: all 0.5s cubic-bezier(0.165, 0.84, 0.44, 1);
+}
+
+.product-card:hover {
+    transform: translateY(-8px) scale(1.01) !important;
+    box-shadow: 0 20px 40px rgba(0,0,0,0.12) !important;
+}
+
+/* 6. Styled price tag to make it pop */
+.product-price {
+    display: block;
+    margin: 10px 0;
+    font-family: 'Monaco', monospace; /* Professional tech look */
+}
+
+/* 7. Advanced Button Animations */
+.btn {
+    position: relative;
+    overflow: hidden;
+    z-index: 1;
+}
+
+.btn::after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: -100%;
+    width: 100%;
+    height: 100%;
+    background: linear-gradient(90deg, transparent, rgba(255,255,255,0.2), transparent);
+    transition: 0.5s;
+    z-index: -1;
+}
+
+.btn:hover::after {
+    left: 100%;
+}
+
+.btn-primary {
+    background: var(--accent-gradient);
+}
+
+/* 8. Modern Input Focus with glowing effect */
+.form-control:focus {
+    box-shadow: 0 0 0 4px rgba(46, 125, 50, 0.15);
+    border-color: var(--forest-green);
+}
+
+/* 9. Floating animation for decorative elements or specific icons */
+@keyframes floating {
+    0% { transform: translateY(0px); }
+    50% { transform: translateY(-5px); }
+    100% { transform: translateY(0px); }
+}
+
+.nav-brand i {
+    animation: floating 3s ease-in-out infinite;
+}
+
+/* 10. Better Mobile Navigation look */
+.mobile-nav {
+    background: var(--glass-bg);
+    backdrop-filter: blur(15px);
+    border-top: 1px solid var(--glass-border);
+    padding-top: 10px;
+}
+
+/* 11. Custom scrollbar for a premium feel */
+::-webkit-scrollbar {
+    width: 8px;
+}
+
+::-webkit-scrollbar-track {
+    background: var(--light-gray);
+}
+
+::-webkit-scrollbar-thumb {
+    background: var(--mint);
+    border-radius: 10px;
+}
+
+::-webkit-scrollbar-thumb:hover {
+    background: var(--forest-green);
+}

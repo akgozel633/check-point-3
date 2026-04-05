@@ -1,0 +1,32 @@
+{% extends "layout.html" %}
+{% block title %}Edit Post{% endblock %}
+{% block content %}
+<div class="container my-5">
+  <h2>Edit Post</h2>
+  <form method="POST" enctype="multipart/form-data">
+    {{ form.hidden_tag() }}
+    <div class="mb-3">
+      {{ form.content(class="form-control", rows="3") }}
+    </div>
+
+    <!-- Показать текущее фото -->
+    {% if post.photo_filename %}
+      <div class="mb-3">
+        <img src="{{ url_for('static', filename='uploads/' ~ post.photo_filename) }}" 
+             class="img-fluid" style="max-width:200px;">
+      </div>
+    {% endif %}
+
+    <div class="mb-3">
+      {{ form.photo(class="form-control") }}
+    </div>
+    <div class="form-check mb-3">
+      {{ form.remove_photo(class="form-check-input") }}
+      <label class="form-check-label" for="remove_photo">Remove existing photo</label>
+    </div>
+
+    {{ form.submit(class="btn btn-success") }}
+    <a href="{{ url_for('forum') }}" class="btn btn-secondary">Cancel</a>
+  </form>
+</div>
+{% endblock %}

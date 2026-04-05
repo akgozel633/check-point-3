@@ -1,0 +1,388 @@
+{% extends "layout.html" %}
+
+{% block title %}Register - EcoMaterial Hub{% endblock %}
+
+{% block content %}
+<style>
+    .form-control {
+        transition: all 0.3s ease;
+        border: 2px solid #ced4da;
+    }
+    
+    .form-control:focus {
+        transform: scale(1.02);
+        box-shadow: 0 0 0 5px rgba(40, 167, 69, 0.3);
+        border-color: #28a745;
+        outline: none;
+    }
+    
+    .input-group {
+        position: relative;
+        transition: transform 0.3s ease;
+    }
+    
+    .input-group.focused {
+        transform: scale(1.02);
+    }
+    
+    .progress-bar {
+        transition: width 0.3s ease, background-color 0.3s ease;
+    }
+    
+    .btn-outline-secondary {
+        transition: all 0.2s ease;
+    }
+    
+    .btn-outline-secondary:hover {
+        transform: scale(1.05);
+        background-color: #6c757d;
+        border-color: #5a6268;
+    }
+    
+    .fa-check {
+        color: #28a745;
+        transition: all 0.3s ease;
+    }
+    
+    .card {
+        animation: slideIn 0.6s ease;
+    }
+    
+    @keyframes slideIn {
+        from { opacity: 0; transform: translateY(30px); }
+        to { opacity: 1; transform: translateY(0); }
+    }
+    
+    .active-field {
+        animation: glow 2s ease-in-out infinite;
+    }
+    
+    @keyframes glow {
+        0% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+        50% { box-shadow: 0 0 0 10px rgba(40, 167, 69, 0.4); }
+        100% { box-shadow: 0 0 0 0 rgba(40, 167, 69, 0); }
+    }
+</style>
+
+<div class="row justify-content-center">
+    <div class="col-md-8">
+        <div class="card">
+            <div class="card-body">
+                <h2 class="card-title text-center text-success mb-4">
+                    <i class="fas fa-user-plus"></i> Register
+                </h2>
+                
+                <form method="POST">
+                    {{ form.hidden_tag() }}
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.business_name.label(class="form-label") }}
+                            {{ form.business_name(class="form-control", id="business_name") }}
+                            {% if form.business_name.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.business_name.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.username.label(class="form-label") }}
+                            {{ form.username(class="form-control", id="username") }}
+                            {% if form.username.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.username.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-6 mb-3">
+                            {{ form.email.label(class="form-label") }}
+                            {{ form.email(class="form-control", id="email") }}
+                            {% if form.email.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.email.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-6 mb-3">
+                            {{ form.phone_number.label(class="form-label") }}
+                            {{ form.phone_number(class="form-control", id="phone_number") }}
+                            {% if form.phone_number.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.phone_number.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                    </div>
+                    
+                    <div class="row">
+                        <div class="col-md-4 mb-3">
+                            {{ form.password.label(class="form-label") }}
+                            <div class="input-group">
+                                {{ form.password(class="form-control", id="password") }}
+                                <button class="btn btn-outline-secondary" type="button" id="toggle-password">
+                                    <i class="fas fa-eye" id="password-icon"></i>
+                                </button>
+                            </div>
+                            {% if form.password.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.password.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                            <!-- Password Strength Indicator -->
+                            <div class="mt-2">
+                                <div class="progress" style="height: 5px;">
+                                    <div class="progress-bar" id="password-strength-bar" role="progressbar" style="width: 0%;"></div>
+                                </div>
+                                <small class="text-muted" id="password-strength-text">Password strength: Weak</small>
+                                <div class="mt-1" id="password-requirements">
+                                    <small class="text-muted">
+                                        <i class="fas fa-times text-danger" id="length-check"></i> At least 8 characters<br>
+                                        <i class="fas fa-times text-danger" id="uppercase-check"></i> One uppercase letter<br>
+                                        <i class="fas fa-times text-danger" id="lowercase-check"></i> One lowercase letter<br>
+                                        <i class="fas fa-times text-danger" id="number-check"></i> One number<br>
+                                        <i class="fas fa-times text-danger" id="special-check"></i> One special character
+                                    </small>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <div class="col-md-4 mb-3">
+                            {{ form.confirm_password.label(class="form-label") }}
+                            <div class="input-group">
+                                {{ form.confirm_password(class="form-control", id="confirm_password") }}
+                                <button class="btn btn-outline-secondary" type="button" id="toggle-confirm-password">
+                                    <i class="fas fa-eye" id="confirm-password-icon"></i>
+                                </button>
+                            </div>
+                            {% if form.confirm_password.errors %}
+                                <div class="text-danger">
+                                    {% for error in form.confirm_password.errors %}
+                                        <small>{{ error }}</small>
+                                    {% endfor %}
+                                </div>
+                            {% endif %}
+                        </div>
+                        
+                        <div class="col-md-4 mb-3 d-flex align-items-end">
+                            <button type="submit" class="btn btn-success w-100">
+                                <i class="fas fa-user-plus"></i> Register
+                            </button>
+                        </div>
+                    </div>
+                </form>
+                
+                <div class="text-center mt-3">
+                    <p class="text-muted">
+                        Already have an account? 
+                        <a href="{{ url_for('login') }}" class="text-success">Login here</a>
+                    </p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
+
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    console.log('Registration form loaded - setting up animations');
+    
+    const passwordInput = document.getElementById('password');
+    const confirmPasswordInput = document.getElementById('confirm_password');
+    const strengthBar = document.getElementById('password-strength-bar');
+    const strengthText = document.getElementById('password-strength-text');
+    const lengthCheck = document.getElementById('length-check');
+    const uppercaseCheck = document.getElementById('uppercase-check');
+    const lowercaseCheck = document.getElementById('lowercase-check');
+    const numberCheck = document.getElementById('number-check');
+    const specialCheck = document.getElementById('special-check');
+    const togglePassword = document.getElementById('toggle-password');
+    const passwordIcon = document.getElementById('password-icon');
+    const toggleConfirmPassword = document.getElementById('toggle-confirm-password');
+    const confirmPasswordIcon = document.getElementById('confirm-password-icon');
+
+    // Get all form inputs for active typing effects
+    const businessNameInput = document.getElementById('business_name');
+    const usernameInput = document.getElementById('username');
+    const emailInput = document.getElementById('email');
+    const phoneInput = document.getElementById('phone_number');
+    const formInputs = [businessNameInput, usernameInput, emailInput, phoneInput, passwordInput, confirmPasswordInput];
+
+    console.log('Form inputs found:', formInputs.filter(input => input !== null).map(input => input.id));
+
+    function checkPasswordStrength(password) {
+        let strength = 0;
+        
+        // Check length (at least 8 characters)
+        if (password.length >= 8) {
+            strength += 25;
+            lengthCheck.className = 'fas fa-check text-success';
+        } else {
+            lengthCheck.className = 'fas fa-times text-danger';
+        }
+        
+        // Check uppercase letter
+        if (/[A-Z]/.test(password)) {
+            strength += 25;
+            uppercaseCheck.className = 'fas fa-check text-success';
+        } else {
+            uppercaseCheck.className = 'fas fa-times text-danger';
+        }
+        
+        // Check lowercase letter
+        if (/[a-z]/.test(password)) {
+            strength += 25;
+            lowercaseCheck.className = 'fas fa-check text-success';
+        } else {
+            lowercaseCheck.className = 'fas fa-times text-danger';
+        }
+        
+        // Check number
+        if (/[0-9]/.test(password)) {
+            strength += 12.5;
+            numberCheck.className = 'fas fa-check text-success';
+        } else {
+            numberCheck.className = 'fas fa-times text-danger';
+        }
+        
+        // Check special character
+        if (/[^A-Za-z0-9]/.test(password)) {
+            strength += 12.5;
+            specialCheck.className = 'fas fa-check text-success';
+        } else {
+            specialCheck.className = 'fas fa-times text-danger';
+        }
+        
+        // Update strength bar and text
+        strengthBar.style.width = strength + '%';
+        
+        if (strength < 50) {
+            strengthText.textContent = 'Password strength: Weak';
+            strengthBar.className = 'progress-bar bg-danger';
+            passwordInput.style.borderColor = '#dc3545';
+        } else if (strength < 75) {
+            strengthText.textContent = 'Password strength: Fair';
+            strengthBar.className = 'progress-bar bg-warning';
+            passwordInput.style.borderColor = '#ffc107';
+        } else if (strength < 100) {
+            strengthText.textContent = 'Password strength: Good';
+            strengthBar.className = 'progress-bar bg-info';
+            passwordInput.style.borderColor = '#17a2b8';
+        } else {
+            strengthText.textContent = 'Password strength: Strong';
+            strengthBar.className = 'progress-bar bg-success';
+            passwordInput.style.borderColor = '#28a745';
+        }
+    }
+    
+    function addActiveEffect(input) {
+        console.log('Adding active effect to:', input.id);
+        input.classList.add('active-field');
+        input.style.borderColor = '#28a745';
+        input.style.boxShadow = '0 0 0 10px rgba(40, 167, 69, 0.4)';
+        
+        setTimeout(() => {
+            input.classList.remove('active-field');
+            input.style.borderColor = '';
+            input.style.boxShadow = '';
+            console.log('Removed active effect from:', input.id);
+        }, 1000);
+    }
+    
+    function addFocusEffect(input) {
+        console.log('Adding focus effect to:', input.id);
+        input.style.transform = 'scale(1.02)';
+        input.style.boxShadow = '0 0 0 5px rgba(40, 167, 69, 0.3)';
+        
+        const inputGroup = input.closest('.input-group');
+        if (inputGroup) {
+            inputGroup.style.transform = 'scale(1.02)';
+        }
+    }
+    
+    function removeFocusEffect(input) {
+        console.log('Removing focus effect from:', input.id);
+        input.style.transform = '';
+        input.style.boxShadow = '';
+        
+        const inputGroup = input.closest('.input-group');
+        if (inputGroup) {
+            inputGroup.style.transform = '';
+        }
+    }
+    
+    // Password visibility toggle
+    if (togglePassword) {
+        togglePassword.addEventListener('click', function() {
+            const type = passwordInput.type === 'password' ? 'text' : 'password';
+            passwordInput.type = type;
+            
+            if (type === 'text') {
+                passwordIcon.className = 'fas fa-eye-slash';
+            } else {
+                passwordIcon.className = 'fas fa-eye';
+            }
+            console.log('Password visibility toggled to:', type);
+        });
+    }
+    
+    // Confirm password visibility toggle
+    if (toggleConfirmPassword) {
+        toggleConfirmPassword.addEventListener('click', function() {
+            const type = confirmPasswordInput.type === 'password' ? 'text' : 'password';
+            confirmPasswordInput.type = type;
+            
+            if (type === 'text') {
+                confirmPasswordIcon.className = 'fas fa-eye-slash';
+            } else {
+                confirmPasswordIcon.className = 'fas fa-eye';
+            }
+            console.log('Confirm password visibility toggled to:', type);
+        });
+    }
+    
+    // Add active typing effects to all form inputs
+    formInputs.forEach(input => {
+        if (input) {
+            console.log('Setting up event listeners for:', input.id);
+            
+            // Active typing animation
+            input.addEventListener('input', function() {
+                console.log('Input detected on:', input.id);
+                addActiveEffect(input);
+                
+                // Special password strength check
+                if (input === passwordInput) {
+                    checkPasswordStrength(this.value);
+                }
+            });
+            
+            // Focus effects
+            input.addEventListener('focus', function() {
+                console.log('Focus detected on:', input.id);
+                addFocusEffect(this);
+            });
+            
+            input.addEventListener('blur', function() {
+                console.log('Blur detected on:', input.id);
+                removeFocusEffect(this);
+            });
+        }
+    });
+});
+</script>
+{% endblock %}
